@@ -200,7 +200,9 @@ input:disabled,select:disabled{opacity:.4}
 <label class="lbl">Nhiệt độ (ấm ↔ lạnh) <b id="vTemp">0</b></label><input type="range" id="temp" min="-100" max="100" value="0">
 <label class="lbl">Chi tiết <b id="vSharp">0%</b></label><input type="range" id="sharp" min="0" max="100" value="0">
 <div class="row" style="margin-top:8px"><button class="btn ghost" id="resetPhoto">↺ Đặt lại màu</button></div>
-<small class="hint">Áp cho tất cả ảnh, ăn theo preset. Cắt/xoay thì làm từng ảnh trong Editor.</small>
+<label class="lbl">Chép màu ảnh này sang</label>
+<div class="row"><button class="btn" data-photo="all">Tất cả</button><button class="btn" data-photo="p">Ảnh dọc</button><button class="btn" data-photo="l">Ảnh ngang</button></div>
+<small class="hint">Màu chỉnh riêng từng ảnh: chọn ảnh nào chỉnh ảnh đó, không ảnh hưởng ảnh khác. Ưng rồi bấm chép sang nhóm khác.</small>
 </div>
 <div class="card"><h3>5 • Xuất file</h3>
 <label class="lbl">Nén ảnh (JPG/WebP quality) <b id="vQ">92%</b></label><input type="range" id="quality" min="40" max="100" value="92">
@@ -257,7 +259,7 @@ input:disabled,select:disabled{opacity:.4}
 <div><b>◈ Preset</b><br>Lưu cấu hình + logo → lần sau chọn preset, thả ảnh là xong.</div>
 <div><b>◈ 👁 Giữ xem gốc</b><br>Giữ nút để so ảnh gốc thô với ảnh đã chỉnh màu + đóng dấu.</div>
 <div><b>◈ ✂ Cắt & xoay</b><br>Bấm ✂ trên Editor, kéo khung (lưới 1/3), chọn tỉ lệ, ✔ Cắt. ⟳ Xoay 90° + slider xoay thẳng chân trời (góc hở tự lấp nền mờ).</div>
-<div><b>◈ Sáng/Màu/Nét</b><br>Card 4: phơi sáng, tương phản, vùng sáng/tối, bão hòa, nhiệt độ, chi tiết + 6 lọc màu 1 chạm.</div>
+<div><b>◈ Sáng/Màu/Nét</b><br>Card 4 chỉnh màu riêng từng ảnh (chọn ảnh nào chỉnh ảnh đó), 6 lọc 1 chạm + nút chép màu sang nhóm khác.</div>
 </div>
 <h3>Mẹo</h3>
 <small class="hint">• Logo đã tách nền + xuất PNG mới giữ được nền trong suốt (JPG thành nền đen).<br>• Không thấy tính năng mới? Nhấn <b>Ctrl+F5</b> để tải lại trang.<br>• Mọi xử lý chạy trên máy bạn — ảnh không upload đi đâu.<br>• Preset nhớ cả logo (nhỏ gọn) + vị trí dọc/ngang — mở lên là dùng ngay.<br>• Chỉnh loạn? Bấm <b>↺ Về cấu hình mặc định</b> (cuối card 5, giữ nguyên logo + ảnh + khung cắt).<br>• <b>Xóa ảnh này</b> chỉ xóa ảnh đang chọn; <b>Xóa hết</b> có hỏi lại trước khi xóa.<br>• PandaLee © 2026 — phát triển bởi <b>PandaLee</b>.</small>
@@ -265,7 +267,8 @@ input:disabled,select:disabled{opacity:.4}
 </div>
 <script>
 const $=id=>document.getElementById(id);
-const S={imgs:[],sel:0,logo:null,logoW:0,logoH:0,logoOrig:null,logoKey:null,pickLogo:false,cutTol:30,lborder:false,lbcolor:'#ffffff',lbw:4,_lbCache:null,busy:false,sizeBase:'min',pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,customP:null,customL:null,filter:'all',exp:0,con:100,high:0,shad:0,sat:100,temp:0,sharp:0,cropMode:false,cropRect:null,cropStart:null,cropAspect:'free'};
+const PHOTO_DEF={exp:0,con:100,high:0,shad:0,sat:100,temp:0,sharp:0};
+const S={imgs:[],sel:0,logo:null,logoW:0,logoH:0,logoOrig:null,logoKey:null,pickLogo:false,cutTol:30,lborder:false,lbcolor:'#ffffff',lbw:4,_lbCache:null,busy:false,sizeBase:'min',pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,customP:null,customL:null,filter:'all',photoNew:{...PHOTO_DEF},cropMode:false,cropRect:null,cropStart:null,cropAspect:'free'};
 const POS={tl:[0,0],tc:[.5,0],tr:[1,0],ml:[0,.5],mc:[.5,.5],mr:[1,.5],bl:[0,1],bc:[.5,1],br:[1,1]};
 const ICONS={tl:'↖',tc:'↑',tr:'↗',ml:'←',mc:'•',mr:'→',bl:'↙',bc:'↓',br:'↘'};
 const p9=$('pos9');Object.keys(POS).forEach(k=>{const b=document.createElement('button');b.textContent=ICONS[k];b.dataset.k=k;if(k==='br')b.classList.add('on');b.onclick=()=>{S.pos=k;S.customP=S.customL=null;[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===k));renderAll();};p9.appendChild(b);});
@@ -289,15 +292,28 @@ $('cmpBtn').disabled=!hasI||S.busy;}
 function bind(id,key,label,fmt){$(id).oninput=e=>{S[key]=+e.target.value;$(label).textContent=fmt(S[key]);renderEditor();queueGrid();};}
 bind('size','size','vSize',v=>v+'%');bind('rot','rot','vRot',v=>v+'°');bind('op','op','vOp',v=>v+'%');
 bind('margin','margin','vMargin',v=>v+'%');bind('tileGap','tileGap','vTile',v=>(v/10).toFixed(1)+'×');bind('quality','quality','vQ',v=>v+'%');
-bind('con','con','vCon',v=>v+'%');bind('sat','sat','vSat',v=>v+'%');bind('sharp','sharp','vSharp',v=>v+'%');
-$('exp').oninput=e=>{S.exp=+e.target.value;$('vExp').textContent=(S.exp>0?'+':'')+S.exp;renderEditor();queueGrid();};
-$('high').oninput=e=>{S.high=+e.target.value;$('vHigh').textContent=S.high+'%';renderEditor();queueGrid();};
-$('shad').oninput=e=>{S.shad=+e.target.value;$('vShad').textContent=S.shad+'%';renderEditor();queueGrid();};
-$('temp').oninput=e=>{S.temp=+e.target.value;$('vTemp').textContent=(S.temp>0?'+':'')+S.temp;renderEditor();queueGrid();};
-function syncPhotoUI(){$('exp').value=S.exp;$('con').value=S.con;$('high').value=S.high;$('shad').value=S.shad;$('sat').value=S.sat;$('temp').value=S.temp;$('sharp').value=S.sharp;$('vExp').textContent=(S.exp>0?'+':'')+S.exp;$('vCon').textContent=S.con+'%';$('vHigh').textContent=S.high+'%';$('vShad').textContent=S.shad+'%';$('vSat').textContent=S.sat+'%';$('vTemp').textContent=(S.temp>0?'+':'')+S.temp;$('vSharp').textContent=S.sharp+'%';}
+function myPhoto(im){if(!im.photo)im.photo={...S.photoNew};return im.photo;}
+function curPhoto(){if(!S.imgs.length)return S.photoNew;return myPhoto(S.imgs[S.sel]);}
+function setPhoto(k,v){curPhoto()[k]=v;}
+function bindPhoto(id,key,label,fmt){$(id).oninput=e=>{const v=+e.target.value;setPhoto(key,v);$(label).textContent=fmt(v);renderEditor();queueGrid();};}
+bindPhoto('con','con','vCon',v=>v+'%');bindPhoto('sat','sat','vSat',v=>v+'%');bindPhoto('sharp','sharp','vSharp',v=>v+'%');
+$('exp').oninput=e=>{const v=+e.target.value;setPhoto('exp',v);$('vExp').textContent=(v>0?'+':'')+v;renderEditor();queueGrid();};
+$('high').oninput=e=>{const v=+e.target.value;setPhoto('high',v);$('vHigh').textContent=v+'%';renderEditor();queueGrid();};
+$('shad').oninput=e=>{const v=+e.target.value;setPhoto('shad',v);$('vShad').textContent=v+'%';renderEditor();queueGrid();};
+$('temp').oninput=e=>{const v=+e.target.value;setPhoto('temp',v);$('vTemp').textContent=(v>0?'+':'')+v;renderEditor();queueGrid();};
+function syncPhotoUI(){const p=curPhoto();$('exp').value=p.exp;$('con').value=p.con;$('high').value=p.high;$('shad').value=p.shad;$('sat').value=p.sat;$('temp').value=p.temp;$('sharp').value=p.sharp;$('vExp').textContent=(p.exp>0?'+':'')+p.exp;$('vCon').textContent=p.con+'%';$('vHigh').textContent=p.high+'%';$('vShad').textContent=p.shad+'%';$('vSat').textContent=p.sat+'%';$('vTemp').textContent=(p.temp>0?'+':'')+p.temp;$('vSharp').textContent=p.sharp+'%';syncFiltBtns();}
+function syncFiltBtns(){const p=curPhoto();let hit='';for(const k in FILT){const m={...PHOTO_DEF,...FILT[k]};if(Object.keys(PHOTO_DEF).every(key=>p[key]===m[key])){hit=k;break;}}document.querySelectorAll('.fbtns button').forEach(x=>x.classList.toggle('on',x.dataset.fp===hit));}
 const FILT={goc:{},ruc:{sat:135,con:112,sharp:25},am:{temp:45,sat:110,high:20,con:105},mat:{temp:-45,sat:112},bw:{sat:0,con:118,shad:15},phim:{temp:30,sat:75,con:88,shad:25}};
-document.querySelectorAll('.fbtns button').forEach(b=>b.onclick=()=>{Object.assign(S,{exp:0,con:100,high:0,shad:0,sat:100,temp:0,sharp:0},FILT[b.dataset.fp]||{});syncPhotoUI();document.querySelectorAll('.fbtns button').forEach(x=>x.classList.toggle('on',x===b));renderEditor();queueGrid();});
-$('resetPhoto').onclick=()=>{Object.assign(S,{exp:0,con:100,high:0,shad:0,sat:100,temp:0,sharp:0});syncPhotoUI();document.querySelectorAll('.fbtns button').forEach(x=>x.classList.toggle('on',x.dataset.fp==='goc'));renderEditor();queueGrid();};
+document.querySelectorAll('.fbtns button').forEach(b=>b.onclick=()=>{Object.assign(curPhoto(),{...PHOTO_DEF},FILT[b.dataset.fp]||{});syncPhotoUI();renderEditor();queueGrid();});
+$('resetPhoto').onclick=()=>{Object.assign(curPhoto(),{...PHOTO_DEF});syncPhotoUI();renderEditor();queueGrid();};
+document.querySelectorAll('[data-photo]').forEach(b=>b.onclick=()=>{
+if(!S.imgs.length)return setStatus('⚠ Chưa có ảnh.');
+const scope=b.dataset.photo,src={...myPhoto(S.imgs[S.sel])};
+const match=im=>scope==='all'||oriOf(im)===scope;
+S.imgs.forEach(im=>{if(match(im))im.photo={...src};});
+syncPhotoUI();renderAll();
+const n=S.imgs.filter(match).length;
+setStatus(`✔ Đã chép màu ảnh này cho ${n} ảnh (${scope==='all'?'tất cả':scope==='p'?'dọc':'ngang'}).`);});
 $('lbw').oninput=e=>{S.lbw=+e.target.value;$('vLbw').textContent=S.lbw+'%';if(!S.lborder){S.lborder=true;$('lborder').checked=true;}paintLogoPrev();renderEditor();queueGrid();};
 $('lborder').onchange=e=>{S.lborder=e.target.checked;paintLogoPrev();renderEditor();queueGrid();};
 $('lbcolor').oninput=e=>{S.lbcolor=e.target.value;S._lbCache=null;if(!S.lborder){S.lborder=true;$('lborder').checked=true;}paintLogoPrev();renderEditor();queueGrid();};
@@ -305,8 +321,8 @@ $('smart').onchange=e=>{S.smart=e.target.checked;renderEditor();queueGrid();};
 $('tile').onchange=e=>{S.tile=e.target.checked;if(S.tile){S.smart=false;$('smart').checked=false;}refreshLock();renderEditor();queueGrid();};
 $('sizeBase').onchange=e=>{S.sizeBase=e.target.value;renderEditor();queueGrid();};
 $('resetPos').onclick=()=>{S.customP=S.customL=null;renderAll();setStatus('↺ Đã về vị trí preset.');};
-const DEFAULTS={pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,lborder:false,lbcolor:'#ffffff',lbw:4,sizeBase:'min',customP:null,customL:null,exp:0,con:100,high:0,shad:0,sat:100,temp:0,sharp:0};
-$('resetCfg').onclick=()=>{setCfg({...DEFAULTS});setStatus('↺ Đã về cấu hình mặc định (giữ nguyên logo + ảnh + khung cắt).');};
+const DEFAULTS={pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,lborder:false,lbcolor:'#ffffff',lbw:4,sizeBase:'min',customP:null,customL:null};
+$('resetCfg').onclick=()=>{setCfg({...DEFAULTS});S.imgs.forEach(im=>{im.photo={...S.photoNew};});syncPhotoUI();renderAll();setStatus('↺ Đã về cấu hình mặc định (giữ nguyên logo + ảnh + khung cắt).');};
 document.querySelectorAll('[data-apply]').forEach(b=>b.onclick=()=>{
 if(!S.imgs.length)return setStatus('⚠ Chưa có ảnh.');
 const scope=b.dataset.apply;
@@ -360,7 +376,7 @@ if(!list.length)return setStatus('⚠ File không phải ảnh.');
 const room=Math.max(0,50-S.imgs.length);
 if(!room)return setStatus('⚠ Tối đa 50 ảnh, hãy xuất bớt rồi thêm tiếp.');
 Promise.all(list.slice(0,room).map(f=>new Promise(res=>{const url=URL.createObjectURL(f);const im=new Image();
-im.onload=()=>res({file:f,name:f.name,img:im,url});im.onerror=()=>{revoke(url);res(null);};im.src=url;})))
+im.onload=()=>res({file:f,name:f.name,img:im,url,photo:{...S.photoNew}});im.onerror=()=>{revoke(url);res(null);};im.src=url;})))
 .then(arr=>{const ok=arr.filter(Boolean);S.imgs.push(...ok);S.sel=Math.min(S.sel,Math.max(0,S.imgs.length-1));renderAll();setStatus(`✔ Đã thêm ${ok.length} ảnh (tổng ${S.imgs.length}).`);});}
 function delImg(i){if(S.busy)return;const r=S.imgs[i];if(r)revoke(r.url);S.imgs.splice(i,1);if(i<S.sel)S.sel--;S.sel=Math.max(0,Math.min(S.sel,S.imgs.length-1));renderAll();}
 $('delOne').onclick=()=>{if(S.busy)return;const im=S.imgs[S.sel];if(!im)return setStatus('⚠ Chưa có ảnh nào để xóa.');
@@ -375,26 +391,26 @@ if(S._lbCache&&S._lbCache.color===color&&S._lbCache.src===S.logo)return S._lbCac
 const c=document.createElement('canvas');c.width=Math.max(1,S.logoW);c.height=Math.max(1,S.logoH);
 const x=c.getContext('2d');x.drawImage(S.logo,0,0);x.globalCompositeOperation='source-in';x.fillStyle=color;x.fillRect(0,0,c.width,c.height);
 S._lbCache={color,src:S.logo,cv:c};return c;}
-function photoFilter(){const f=[];if(S.exp)f.push(`brightness(${1+S.exp/100})`);if(S.con!==100)f.push(`contrast(${S.con/100})`);if(S.sat!==100)f.push(`saturate(${S.sat/100})`);return f.length?f.join(' '):'none';}
+function photoFilter(ph){ph=ph||PHOTO_DEF;const f=[];if(ph.exp)f.push(`brightness(${1+ph.exp/100})`);if(ph.con!==100)f.push(`contrast(${ph.con/100})`);if(ph.sat!==100)f.push(`saturate(${ph.sat/100})`);return f.length?f.join(' '):'none';}
 function outDims(im){const b=im.crop||{x:0,y:0,w:1,h:1},rot=((im.rot||0)%4+4)%4,st=+im.straight||0;const cw=Math.max(1,Math.round(im.img.naturalWidth*b.w)),ch=Math.max(1,Math.round(im.img.naturalHeight*b.h));let W=rot%2?ch:cw,H=rot%2?cw:ch;if(st){const a=Math.abs(st)*Math.PI/180,c=Math.cos(a),s=Math.sin(a),eW=Math.round(W*c+H*s);H=Math.round(W*s+H*c);W=eW;}return{b,rot,cw,ch,straight:st,W,H};}
 function straightInverse(rx,ry,o){const st=o.straight||0;if(!st)return{x:rx,y:ry};const a=-st*Math.PI/180,dx=rx*o.W-o.W/2,dy=ry*o.H-o.H/2,cx=dx*Math.cos(a)-dy*Math.sin(a),cy=dx*Math.sin(a)+dy*Math.cos(a);const kw=o.rot%2?o.ch:o.cw,kh=o.rot%2?o.cw:o.ch;return{x:(cx+kw/2)/kw,y:(cy+kh/2)/kh};}
 function out2crop(rx,ry,rot){rot=((rot%4)+4)%4;if(rot===1)return{x:ry,y:1-rx};if(rot===2)return{x:1-rx,y:1-ry};if(rot===3)return{x:1-ry,y:rx};return{x:rx,y:ry};}
-function drawMarked(ctx,W,H,img,customPos,px,crop,rot,straight){
-px=px||1;crop=crop||{x:0,y:0,w:1,h:1};rot=((rot||0)%4+4)%4;straight=+straight||0;
+function drawMarked(ctx,W,H,img,customPos,px,crop,rot,straight,photo){
+px=px||1;crop=crop||{x:0,y:0,w:1,h:1};rot=((rot||0)%4+4)%4;straight=+straight||0;photo=photo||PHOTO_DEF;
 const sx=crop.x*img.naturalWidth,sy=crop.y*img.naturalHeight,sw=Math.max(1,crop.w*img.naturalWidth),sh=Math.max(1,crop.h*img.naturalHeight);
 const cw=Math.max(1,Math.round(sw)),ch=Math.max(1,Math.round(sh));
 const coreW=rot%2?ch:cw,coreH=rot%2?cw:ch;
-const photo=document.createElement('canvas');photo.width=coreW;photo.height=coreH;const bc=photo.getContext('2d');
+const pcv=document.createElement('canvas');pcv.width=coreW;pcv.height=coreH;const bc=pcv.getContext('2d');
 bc.save();bc.translate(coreW/2,coreH/2);bc.rotate(rot*Math.PI/2);
-const pf=photoFilter();if(pf!=='none')bc.filter=pf;
+const pf=photoFilter(photo);if(pf!=='none')bc.filter=pf;
 bc.drawImage(img,sx,sy,sw,sh,-cw/2,-ch/2,cw,ch);
-if(S.sharp>0){bc.save();bc.globalAlpha=Math.min(.55,S.sharp/100*.55);bc.filter=(pf!=='none'?pf+' ':'')+`blur(${Math.max(.8,px)}px)`;bc.globalCompositeOperation='overlay';bc.drawImage(img,sx,sy,sw,sh,-cw/2,-ch/2,cw,ch);bc.restore();}
+if(photo.sharp>0){bc.save();bc.globalAlpha=Math.min(.55,photo.sharp/100*.55);bc.filter=(pf!=='none'?pf+' ':'')+`blur(${Math.max(.8,px)}px)`;bc.globalCompositeOperation='overlay';bc.drawImage(img,sx,sy,sw,sh,-cw/2,-ch/2,cw,ch);bc.restore();}
 bc.restore();
-if(S.shad>0){bc.save();bc.globalAlpha=S.shad/100*.45;bc.globalCompositeOperation='soft-light';bc.fillStyle='#fff';bc.fillRect(0,0,coreW,coreH);bc.restore();}
-if(S.high>0){bc.save();bc.globalAlpha=S.high/100*.45;bc.globalCompositeOperation='soft-light';bc.fillStyle='#3c3c3c';bc.fillRect(0,0,coreW,coreH);bc.restore();}
-if(S.temp){bc.save();bc.globalAlpha=Math.abs(S.temp)/100*.5;bc.globalCompositeOperation='soft-light';bc.fillStyle=S.temp>0?'#ff8c28':'#3c78ff';bc.fillRect(0,0,coreW,coreH);bc.restore();}
-let B=photo;
-if(straight){B=document.createElement('canvas');B.width=W;B.height=H;const q=B.getContext('2d');const s=Math.max(W/coreW,H/coreH),dw=coreW*s,dh=coreH*s;q.filter='blur(24px)';q.drawImage(photo,(W-dw)/2,(H-dh)/2,dw,dh);q.filter='none';q.save();q.translate(W/2,H/2);q.rotate(straight*Math.PI/180);q.drawImage(photo,-coreW/2,-coreH/2);q.restore();}
+if(photo.shad>0){bc.save();bc.globalAlpha=photo.shad/100*.45;bc.globalCompositeOperation='soft-light';bc.fillStyle='#fff';bc.fillRect(0,0,coreW,coreH);bc.restore();}
+if(photo.high>0){bc.save();bc.globalAlpha=photo.high/100*.45;bc.globalCompositeOperation='soft-light';bc.fillStyle='#3c3c3c';bc.fillRect(0,0,coreW,coreH);bc.restore();}
+if(photo.temp){bc.save();bc.globalAlpha=Math.abs(photo.temp)/100*.5;bc.globalCompositeOperation='soft-light';bc.fillStyle=photo.temp>0?'#ff8c28':'#3c78ff';bc.fillRect(0,0,coreW,coreH);bc.restore();}
+let B=pcv;
+if(straight){B=document.createElement('canvas');B.width=W;B.height=H;const q=B.getContext('2d');const s=Math.max(W/coreW,H/coreH),dw=coreW*s,dh=coreH*s;q.filter='blur(24px)';q.drawImage(pcv,(W-dw)/2,(H-dh)/2,dw,dh);q.filter='none';q.save();q.translate(W/2,H/2);q.rotate(straight*Math.PI/180);q.drawImage(pcv,-coreW/2,-coreH/2);q.restore();}
 ctx.clearRect(0,0,W,H);ctx.drawImage(B,0,0);
 if(!S.logo)return null;
 const m=S.margin/100*Math.min(W,H);
@@ -438,9 +454,9 @@ if($('straight')){const st=cur.straight||0;$('straight').value=st;$('vStraight')
 const dispW=Math.min(900,o.W),sc=dispW/o.W;
 ed.width=dispW;ed.height=Math.round(o.H*sc);
 const ctx=ed.getContext('2d');ctx.save();ctx.scale(sc,sc);
-geom=drawMarked(ctx,o.W,o.H,cur.img,effCustom(cur),sc,o.b,o.rot,o.straight);ctx.restore();
+geom=drawMarked(ctx,o.W,o.H,cur.img,effCustom(cur),sc,o.b,o.rot,o.straight,myPhoto(cur));ctx.restore();
 drawCropOverlay();
-paintRanges();steps();refreshLock();}
+syncPhotoUI();paintRanges();steps();refreshLock();}
 function renderGrid(){
 $('count').textContent=S.imgs.length;
 const nP=S.imgs.filter(im=>oriOf(im)==='p').length;
@@ -454,7 +470,7 @@ S.imgs.forEach((im,i)=>{
 if(S.filter!=='all'&&oriOf(im)!==S.filter)return;shown++;
 const d=document.createElement('div');d.className='thumb'+(i===S.sel?' sel':'');d.title='Bấm để chọn sửa';
 const c=document.createElement('canvas');const o=outDims(im);const tw=300,sc2=tw/o.W;c.width=tw;c.height=Math.max(1,Math.round(o.H*sc2));
-const x=c.getContext('2d');x.save();x.scale(sc2,sc2);drawMarked(x,o.W,o.H,im.img,curCustom(i),sc2,o.b,o.rot,o.straight);x.restore();
+const x=c.getContext('2d');x.save();x.scale(sc2,sc2);drawMarked(x,o.W,o.H,im.img,curCustom(i),sc2,o.b,o.rot,o.straight,myPhoto(im));x.restore();
 const idx=document.createElement('span');idx.className='idx';idx.textContent=String(i+1).padStart(2,'0');
 const mt=document.createElement('div');mt.className='meta';mt.title=im.name;const s1=document.createElement('span');s1.textContent=im.name;const s2=document.createElement('span');s2.textContent=(im.file.size/1024).toFixed(0)+'KB';mt.append(s1,s2);
 const del=document.createElement('button');del.className='x';del.textContent='✕';del.title='Xóa ảnh này';del.onclick=e=>{e.stopPropagation();delImg(i);};
@@ -530,7 +546,7 @@ ni.src=c.toDataURL('image/png');}
 // ---- export full-res ----
 function renderFull(im){
 const o=outDims(im),c=document.createElement('canvas');c.width=o.W;c.height=o.H;
-drawMarked(c.getContext('2d'),o.W,o.H,im.img,effCustom(im),1,o.b,o.rot,o.straight);return c;}
+drawMarked(c.getContext('2d'),o.W,o.H,im.img,effCustom(im),1,o.b,o.rot,o.straight,myPhoto(im));return c;}
 function outName(im,i){const n=im.name.replace(/\.[^.]+$/,'');const t=($('rename').value||'[Ten_SanPham]_[So_Thu_Tu]').replace('[Ten_SanPham]',n).replace('[So_Thu_Tu]',String(i+1).padStart(2,'0')).replace(/[^\w\-À-ỹ ]/g,'').trim().replace(/\s+/g,'_');const ext=$('fmt').value==='image/png'?'png':$('fmt').value==='image/webp'?'webp':'jpg';return`${t||'anh'}.${ext}`;}
 function setStatus(t){$('status').textContent=t;if(/^[✔⚠↺]/.test(t))toast(t,/^⚠/.test(t));}
 function setBusy(b){S.busy=b;refreshLock();}
@@ -566,13 +582,15 @@ const out=await zip.generateAsync({type:'blob'},m=>{prog.value=90+Math.round((m.
 // ---- profiles ----
 function Num(v,d){v=+v;return Number.isFinite(v)?v:d;}
 function logoURL(){try{if(!S.logo)return null;if(S.logoW*S.logoH>640000){toast('⚠ Logo quá to, preset không nhớ logo.',true);return null;}const c=document.createElement('canvas');c.width=S.logoW;c.height=S.logoH;c.getContext('2d').drawImage(S.logo,0,0);return c.toDataURL('image/png');}catch(e){return null;}}
-function getCfg(){return{pos:S.pos,margin:S.margin,size:S.size,rot:S.rot,op:S.op,tile:S.tile,tileGap:S.tileGap,smart:S.smart,lborder:S.lborder,lbcolor:S.lbcolor,lbw:S.lbw,sizeBase:S.sizeBase,customP:S.customP,customL:S.customL,exp:S.exp,con:S.con,high:S.high,shad:S.shad,sat:S.sat,temp:S.temp,sharp:S.sharp,logo:logoURL(),rename:$('rename').value,fmt:$('fmt').value,quality:$('quality').value};}
-function setCfg(c){c=c||{};Object.assign(S,{pos:c.pos||'br',margin:Num(c.margin,4),size:Num(c.size,18),rot:Num(c.rot,0),op:Num(c.op,90),tile:!!c.tile,tileGap:Num(c.tileGap,22),smart:!!c.smart,lborder:!!c.lborder,lbcolor:c.lbcolor||'#ffffff',lbw:Num(c.lbw,4),sizeBase:c.sizeBase||'min',customP:c.customP||null,customL:c.customL||null,exp:Num(c.exp,0),con:Num(c.con,100),high:Num(c.high,0),shad:Num(c.shad,0),sat:Num(c.sat,100),temp:Num(c.temp,0),sharp:Num(c.sharp,0)});if(S.tile)S.smart=false;
+function getCfg(){return{pos:S.pos,margin:S.margin,size:S.size,rot:S.rot,op:S.op,tile:S.tile,tileGap:S.tileGap,smart:S.smart,lborder:S.lborder,lbcolor:S.lbcolor,lbw:S.lbw,sizeBase:S.sizeBase,customP:S.customP,customL:S.customL,photoNew:{...S.photoNew},logo:logoURL(),rename:$('rename').value,fmt:$('fmt').value,quality:$('quality').value};}
+function setCfg(c){c=c||{};Object.assign(S,{pos:c.pos||'br',margin:Num(c.margin,4),size:Num(c.size,18),rot:Num(c.rot,0),op:Num(c.op,90),tile:!!c.tile,tileGap:Num(c.tileGap,22),smart:!!c.smart,lborder:!!c.lborder,lbcolor:c.lbcolor||'#ffffff',lbw:Num(c.lbw,4),sizeBase:c.sizeBase||'min',customP:c.customP||null,customL:c.customL||null});if(S.tile)S.smart=false;
+const oldPhoto=c.photoNew||c.photoP||(c.exp!==undefined?{exp:Num(c.exp,0),con:Num(c.con,100),high:Num(c.high,0),shad:Num(c.shad,0),sat:Num(c.sat,100),temp:Num(c.temp,0),sharp:Num(c.sharp,0)}:null);
+S.photoNew={...PHOTO_DEF,...(oldPhoto||{})};
 if(c.logo){const im=new Image();im.onload=()=>{revoke(S.logoURL);S.logoURL=null;S.logo=im;S.logoW=im.naturalWidth;S.logoH=im.naturalHeight;S.logoOrig=null;S.logoKey=null;S.pickLogo=false;S._lbCache=null;$('pickBg').textContent='🎯 Tách nền logo';$('cutSw').style.background='';$('logoPrev').src=c.logo;$('logoName').textContent='✔ Logo lấy từ preset';logoBox.classList.remove('pick');logoBox.classList.add('has');paintLogoPrev();renderAll();};im.src=c.logo;}
 $('margin').value=S.margin;$('size').value=S.size;$('rot').value=S.rot;$('op').value=S.op;$('tileGap').value=S.tileGap;$('quality').value=c.quality||92;$('lbw').value=S.lbw;
 $('smart').checked=S.smart;$('tile').checked=S.tile;$('lborder').checked=S.lborder;$('sizeBase').value=S.sizeBase;$('lbcolor').value=S.lbcolor;$('rename').value=c.rename||'[Ten_SanPham]_[So_Thu_Tu]';$('fmt').value=c.fmt||'image/jpeg';
 $('vMargin').textContent=S.margin+'%';$('vSize').textContent=S.size+'%';$('vRot').textContent=S.rot+'°';$('vOp').textContent=S.op+'%';$('vTile').textContent=(S.tileGap/10).toFixed(1)+'×';$('vQ').textContent=$('quality').value+'%';
-[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===S.pos));syncPhotoUI();const isDef=S.exp===0&&S.con===100&&S.high===0&&S.shad===0&&S.sat===100&&S.temp===0&&S.sharp===0;document.querySelectorAll('.fbtns button').forEach(x=>x.classList.toggle('on',isDef&&x.dataset.fp==='goc'));paintLogoPrev();renderAll();}
+[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===S.pos));syncPhotoUI();paintLogoPrev();renderAll();}
 function loadProfiles(){let all;try{all=JSON.parse(localStorage.getItem('logosnap_profiles')||'')}catch(e){all=null;}
 if(!all)all={"Mặc định (Top-Right 80%)":{pos:'tr',margin:4,size:18,rot:0,op:80}};
 const s=$('profile');s.innerHTML='';Object.keys(all).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;s.appendChild(o);});return all;}
