@@ -238,7 +238,7 @@ input:disabled,select:disabled{opacity:.4}
 <progress id="zipProg" max="100" value="0" hidden style="width:100%;height:6px;accent-color:var(--acc)"></progress>
 </div>
 </main>
-<footer>🐼 PandaLee — đóng dấu logo hàng loạt, ảnh <b>không rời khỏi máy bạn</b> • Mẹo: lưu <b>Preset</b> để lần sau thả ảnh vào là xong<br><small class="hint">Phát triển bởi <b>PandaLee</b> • © 2026</small></footer>
+<footer>🐼 PandaLee — đóng dấu logo hàng loạt, ảnh <b>không rời khỏi máy bạn</b> • Mẹo: lưu <b>Preset</b> để lần sau thả ảnh vào là xong<br><small class="hint">Phát triển bởi <b>PandaLee</b> • © 2026 • v1.5</small></footer>
 </div>
 <div id="toast"></div>
 <div class="overlay" id="helpModal">
@@ -269,7 +269,7 @@ input:disabled,select:disabled{opacity:.4}
 <div class="overlay" id="dlModal">
 <div class="sheet" style="max-width:720px">
 <div class="chead"><h3>⬇ Xem trước ảnh xuất</h3><button class="btn ghost" id="dlClose">✕ Đóng</button></div>
-<img id="dlPrev" style="width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--line);background:repeating-conic-gradient(#1c2230 0 25%,#11141c 0 50%) 0 0/22px 22px" alt="xem truoc anh xuat">
+<img id="dlPrev" style="width:100%;height:auto;max-height:62vh;object-fit:contain;display:block;border-radius:12px;border:1px solid var(--line);background:repeating-conic-gradient(#1c2230 0 25%,#11141c 0 50%) 0 0/22px 22px" alt="xem truoc anh xuat">
 <div class="edfoot"><small class="hint" id="dlName">chưa có ảnh</small></div>
 <div class="row" style="margin-top:10px"><button class="btn ghost" id="dlCancel">✕ Hủy</button><button class="btn pri" id="dlGo">⬇ Tải xuống</button></div>
 </div>
@@ -569,6 +569,7 @@ if(S.busy)return;
 if(!S.imgs.length)return setStatus('⚠ Chưa có ảnh.');
 setBusy(true);const im=S.imgs[S.sel],fc=renderFull(im),dims=fc.width+'×'+fc.height;fc.toBlob(b=>{setBusy(false);if(!b)return setStatus('⚠ Xuất lỗi, thử định dạng khác.');dlCleanup();dlBlob=b;dlURL=URL.createObjectURL(b);dlFile=outName(im,S.sel);$('dlPrev').src=dlURL;$('dlName').textContent=dlFile+' • '+dims;$('dlModal').classList.add('show');},$('fmt').value,$('quality').value/100);};
 $('dlGo').onclick=()=>{if(!dlBlob)return;saveBlob(dlBlob,dlFile);setStatus('✔ Đã tải '+dlFile);$('dlModal').classList.remove('show');dlCleanup();};
+$('dlPrev').onerror=()=>{setStatus('⚠ Không hiện được ảnh xem trước, cứ bấm Tải xuống để tải trực tiếp.');};
 $('dlClose').onclick=closeDl;$('dlCancel').onclick=closeDl;
 $('dlZip').onclick=async()=>{
 if(S.busy)return;
