@@ -178,9 +178,9 @@ input:disabled,select:disabled{opacity:.4}
 <input type="range" id="margin" min="0" max="15" value="4" step="0.5">
 <small class="hint">Mẹo: kéo logo ngay trên ảnh lớn để đặt tự do. Nút “↺ Về preset 9 điểm” để quay về lưới cố định.</small>
 <div class="row" style="margin-top:8px"><button class="btn" id="resetPos">↺ Về preset 9 điểm</button></div>
-<label class="lbl">Áp dụng vị trí đã kéo cho</label>
+<label class="lbl">Chép logo ảnh này sang</label>
 <div class="row"><button class="btn" data-apply="all">Tất cả</button><button class="btn" data-apply="p">Ảnh dọc</button><button class="btn" data-apply="l">Ảnh ngang</button></div>
-<small class="hint">Vị trí tự nhớ riêng từng nhóm: kéo trên 1 ảnh dọc là mọi ảnh dọc ăn theo (vuông tính vào ngang).</small>
+<small class="hint">Logo chỉnh riêng từng ảnh: chọn ảnh nào chỉnh ảnh đó, không ảnh hưởng ảnh khác. Ưng rồi bấm chép sang nhóm khác (vuông tính vào ngang).</small>
 </div>
 <div class="card"><h3>3 • Kích thước • Xoay • Đậm</h3>
 <label class="lbl">Tỉ lệ logo / ảnh <b id="vSize">18%</b></label><input type="range" id="size" min="3" max="60" value="18">
@@ -247,8 +247,8 @@ input:disabled,select:disabled{opacity:.4}
 <ol class="steps-list">
 <li><b>Thêm logo</b> — bấm / kéo-thả file vào ô Logo (card 1). Logo nền trắng? Bật <b>🎯 Tách nền logo</b> rồi bấm vào vùng nền trong ô để tách thành trong suốt.</li>
 <li><b>Thêm ảnh</b> — bấm <b>＋ Thêm ảnh</b> hoặc kéo-thả nhiều ảnh vào khung (tối đa 50 ảnh, free demo 10 ảnh/lần xuất). Dùng nút <b>Tất cả / Ảnh dọc / Ảnh ngang</b> trên lưới để lọc từng nhóm mà chỉnh.</li>
-<li><b>Chỉnh logo</b> — chọn 1 trong 9 điểm đặt, hoặc <b>kéo trực tiếp logo trên ảnh lớn</b>. Chỉnh tỉ lệ (đã tự đều cả dọc + ngang), xoay, độ đậm, lề. Nút <b>↺ Về preset 9 điểm</b> để hủy vị trí kéo tay.</li>
-<li><b>Áp dụng vị trí</b> — vị trí tự nhớ riêng từng nhóm: kéo logo trên 1 ảnh dọc là mọi ảnh dọc ăn theo ngay. Ba nút <b>Tất cả / Ảnh dọc / Ảnh ngang</b> (card 2) để copy vị trí nhóm này sang nhóm khác.</li>
+<li><b>Chỉnh logo</b> — chọn ảnh nào chỉnh ảnh đó: 1 trong 9 điểm đặt, hoặc <b>kéo trực tiếp logo trên ảnh lớn</b>. Chỉnh tỉ lệ, xoay, độ đậm, lề. Nút <b>↺ Về preset 9 điểm</b> để hủy vị trí kéo tay.</li>
+<li><b>Chép logo</b> — ưng ý rồi bấm ba nút <b>Tất cả / Ảnh dọc / Ảnh ngang</b> (card 2) để chép logo ảnh này sang nhóm khác. Chưa bấm thì các ảnh khác đứng yên.</li>
 <li><b>Xuất file</b> — <b>⬇ Tải tất cả (.ZIP)</b> hoặc tải lẻ ảnh đang chọn. Mất mạng vẫn tải lẻ từng ảnh được. Đặt tên hàng loạt, chọn JPG (nhẹ) / PNG (nét, giữ nền trong suốt) / WebP.</li>
 </ol>
 <h3>Tính năng nâng cao</h3>
@@ -260,23 +260,33 @@ input:disabled,select:disabled{opacity:.4}
 <div><b>◈ 👁 Giữ xem gốc</b><br>Giữ nút để so ảnh gốc thô với ảnh đã chỉnh màu + đóng dấu.</div>
 <div><b>◈ ✂ Cắt & xoay</b><br>Bấm ✂ trên Editor, kéo khung (lưới 1/3), chọn tỉ lệ, ✔ Cắt. ⟳ Xoay 90° + slider xoay thẳng chân trời (góc hở tự lấp nền mờ).</div>
 <div><b>◈ Sáng/Màu/Nét</b><br>Card 4 chỉnh màu riêng từng ảnh (chọn ảnh nào chỉnh ảnh đó), 6 lọc 1 chạm + nút chép màu sang nhóm khác.</div>
+<div><b>◈ Xuất không logo</b><br>Chỉ chỉnh màu/cắt ảnh thì vẫn xuất được, không bắt buộc gắn logo.</div>
 </div>
 <h3>Mẹo</h3>
 <small class="hint">• Logo đã tách nền + xuất PNG mới giữ được nền trong suốt (JPG thành nền đen).<br>• Không thấy tính năng mới? Nhấn <b>Ctrl+F5</b> để tải lại trang.<br>• Mọi xử lý chạy trên máy bạn — ảnh không upload đi đâu.<br>• Preset nhớ cả logo (nhỏ gọn) + vị trí dọc/ngang — mở lên là dùng ngay.<br>• Chỉnh loạn? Bấm <b>↺ Về cấu hình mặc định</b> (cuối card 5, giữ nguyên logo + ảnh + khung cắt).<br>• <b>Xóa ảnh này</b> chỉ xóa ảnh đang chọn; <b>Xóa hết</b> có hỏi lại trước khi xóa.<br>• PandaLee © 2026 — phát triển bởi <b>PandaLee</b>.</small>
 </div>
 </div>
+<div class="overlay" id="dlModal">
+<div class="sheet" style="max-width:720px">
+<div class="chead"><h3>⬇ Xem trước ảnh xuất</h3><button class="btn ghost" id="dlClose">✕ Đóng</button></div>
+<img id="dlPrev" style="width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--line);background:repeating-conic-gradient(#1c2230 0 25%,#11141c 0 50%) 0 0/22px 22px" alt="xem truoc anh xuat">
+<div class="edfoot"><small class="hint" id="dlName">chưa có ảnh</small></div>
+<div class="row" style="margin-top:10px"><button class="btn ghost" id="dlCancel">✕ Hủy</button><button class="btn pri" id="dlGo">⬇ Tải xuống</button></div>
+</div>
+</div>
 <script>
 const $=id=>document.getElementById(id);
 const PHOTO_DEF={exp:0,con:100,high:0,shad:0,sat:100,temp:0,sharp:0};
-const S={imgs:[],sel:0,logo:null,logoW:0,logoH:0,logoOrig:null,logoKey:null,pickLogo:false,cutTol:30,lborder:false,lbcolor:'#ffffff',lbw:4,_lbCache:null,busy:false,sizeBase:'min',pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,customP:null,customL:null,filter:'all',photoNew:{...PHOTO_DEF},cropMode:false,cropRect:null,cropStart:null,cropAspect:'free'};
+const DEF_LOGO={pos:'br',margin:4,size:18,rot:0,op:90};
+const S={imgs:[],sel:0,logo:null,logoW:0,logoH:0,logoOrig:null,logoKey:null,pickLogo:false,cutTol:30,lborder:false,lbcolor:'#ffffff',lbw:4,_lbCache:null,busy:false,sizeBase:'min',tile:false,tileGap:22,smart:false,filter:'all',logoNew:{...DEF_LOGO},photoNew:{...PHOTO_DEF},cropMode:false,cropRect:null,cropStart:null,cropAspect:'free'};
 const POS={tl:[0,0],tc:[.5,0],tr:[1,0],ml:[0,.5],mc:[.5,.5],mr:[1,.5],bl:[0,1],bc:[.5,1],br:[1,1]};
 const ICONS={tl:'↖',tc:'↑',tr:'↗',ml:'←',mc:'•',mr:'→',bl:'↙',bc:'↓',br:'↘'};
-const p9=$('pos9');Object.keys(POS).forEach(k=>{const b=document.createElement('button');b.textContent=ICONS[k];b.dataset.k=k;if(k==='br')b.classList.add('on');b.onclick=()=>{S.pos=k;S.customP=S.customL=null;[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===k));renderAll();};p9.appendChild(b);});
+const p9=$('pos9');Object.keys(POS).forEach(k=>{const b=document.createElement('button');b.textContent=ICONS[k];b.dataset.k=k;if(k==='br')b.classList.add('on');b.onclick=()=>{const lo=curLogo();lo.pos=k;lo.custom=null;[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===k));renderAll();};p9.appendChild(b);});
 let gt=null;function queueGrid(){clearTimeout(gt);gt=setTimeout(renderGrid,150);}
 function paintRanges(){document.querySelectorAll('input[type=range]').forEach(el=>{el.style.setProperty('--fill',((el.value-el.min)/(el.max-el.min)*100)+'%');});}
 let toastT=null;function toast(m,err){const t=$('toast');t.textContent=m;t.className='show'+(err?' err':'');clearTimeout(toastT);toastT=setTimeout(()=>t.className='',2800);}
 function steps(){const hasL=!!S.logo,hasI=S.imgs.length>0;const st=$('st1');if(!st)return;
-const map=[['st1',hasL],['st2',hasI],['st3',hasL&&hasI],['st4',hasL&&hasI]];
+const map=[['st1',hasL],['st2',hasI],['st3',hasI],['st4',hasI]];
 let actSet=false;map.forEach(([id,done])=>{const el=$(id);el.classList.toggle('done',done);
 el.classList.toggle('active',!done&&!actSet);if(!done)actSet=true;});}
 const LOGO_CTL=['margin','size','rot','op','tileGap','lbw','cutTol','sizeBase','smart','tile','lborder','lbcolor','pickBg','cutUndo','resetPos'];
@@ -285,13 +295,17 @@ const hasL=!!S.logo,hasI=S.imgs.length>0;
 LOGO_CTL.forEach(id=>{const el=$(id);if(el)el.disabled=!hasL;});
 [...p9.children].forEach(b=>b.disabled=!hasL);
 document.querySelectorAll('[data-apply]').forEach(b=>b.disabled=!hasL||!hasI);
-$('dlZip').disabled=$('dlOne').disabled=S.busy||!hasI||!hasL;
+$('dlZip').disabled=$('dlOne').disabled=S.busy||!hasI;
 $('delOne').disabled=$('clear').disabled=S.busy||!hasI;if(S.tile&&hasL){$('smart').disabled=true;}
 $('cropBtn').disabled=!hasI||S.busy;
 $('cmpBtn').disabled=!hasI||S.busy;}
 function bind(id,key,label,fmt){$(id).oninput=e=>{S[key]=+e.target.value;$(label).textContent=fmt(S[key]);renderEditor();queueGrid();};}
-bind('size','size','vSize',v=>v+'%');bind('rot','rot','vRot',v=>v+'°');bind('op','op','vOp',v=>v+'%');
-bind('margin','margin','vMargin',v=>v+'%');bind('tileGap','tileGap','vTile',v=>(v/10).toFixed(1)+'×');bind('quality','quality','vQ',v=>v+'%');
+function myLogo(im){if(!im.logo)im.logo={...S.logoNew,custom:null};return im.logo;}
+function curLogo(){if(!S.imgs.length)return S.logoNew;return myLogo(S.imgs[S.sel]);}
+function bindLogo(id,key,label,fmt){$(id).oninput=e=>{const v=+e.target.value;curLogo()[key]=v;$(label).textContent=fmt(v);renderEditor();queueGrid();};}
+function syncLogoUI(){const lo=curLogo();$('margin').value=lo.margin;$('size').value=lo.size;$('rot').value=lo.rot;$('op').value=lo.op;$('vMargin').textContent=lo.margin+'%';$('vSize').textContent=lo.size+'%';$('vRot').textContent=lo.rot+'°';$('vOp').textContent=lo.op+'%';[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===lo.pos));}
+bindLogo('size','size','vSize',v=>v+'%');bindLogo('rot','rot','vRot',v=>v+'°');bindLogo('op','op','vOp',v=>v+'%');
+bindLogo('margin','margin','vMargin',v=>v+'%');bind('tileGap','tileGap','vTile',v=>(v/10).toFixed(1)+'×');bind('quality','quality','vQ',v=>v+'%');
 function myPhoto(im){if(!im.photo)im.photo={...S.photoNew};return im.photo;}
 function curPhoto(){if(!S.imgs.length)return S.photoNew;return myPhoto(S.imgs[S.sel]);}
 function setPhoto(k,v){curPhoto()[k]=v;}
@@ -320,20 +334,17 @@ $('lbcolor').oninput=e=>{S.lbcolor=e.target.value;S._lbCache=null;if(!S.lborder)
 $('smart').onchange=e=>{S.smart=e.target.checked;renderEditor();queueGrid();};
 $('tile').onchange=e=>{S.tile=e.target.checked;if(S.tile){S.smart=false;$('smart').checked=false;}refreshLock();renderEditor();queueGrid();};
 $('sizeBase').onchange=e=>{S.sizeBase=e.target.value;renderEditor();queueGrid();};
-$('resetPos').onclick=()=>{S.customP=S.customL=null;renderAll();setStatus('↺ Đã về vị trí preset.');};
-const DEFAULTS={pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,lborder:false,lbcolor:'#ffffff',lbw:4,sizeBase:'min',customP:null,customL:null};
-$('resetCfg').onclick=()=>{setCfg({...DEFAULTS});S.imgs.forEach(im=>{im.photo={...S.photoNew};});syncPhotoUI();renderAll();setStatus('↺ Đã về cấu hình mặc định (giữ nguyên logo + ảnh + khung cắt).');};
+$('resetPos').onclick=()=>{curLogo().custom=null;renderAll();setStatus('↺ Đã về vị trí preset.');};
+const DEFAULTS={tile:false,tileGap:22,smart:false,lborder:false,lbcolor:'#ffffff',lbw:4,sizeBase:'min'};
+$('resetCfg').onclick=()=>{setCfg({...DEFAULTS});S.imgs.forEach(im=>{im.photo={...S.photoNew};im.logo={...S.logoNew,custom:null};});syncPhotoUI();syncLogoUI();renderAll();setStatus('↺ Đã về cấu hình mặc định (giữ nguyên logo + ảnh + khung cắt).');};
 document.querySelectorAll('[data-apply]').forEach(b=>b.onclick=()=>{
 if(!S.imgs.length)return setStatus('⚠ Chưa có ảnh.');
-const scope=b.dataset.apply;
-const g=effCustom(S.imgs[S.sel]);
-if(!g)return setStatus('⚠ Kéo logo trên ảnh lớn trước, rồi mới áp dụng.');
+const scope=b.dataset.apply,src=myLogo(S.imgs[S.sel]);
 const match=im=>scope==='all'||oriOf(im)===scope;
-if(scope==='all'||scope==='p')S.customP={...g};
-if(scope==='all'||scope==='l')S.customL={...g};
-renderAll();
+S.imgs.forEach(im=>{if(match(im))im.logo={...src,custom:src.custom?{...src.custom}:null};});
+syncLogoUI();renderAll();
 const n=S.imgs.filter(match).length;
-setStatus(`✔ Đã áp vị trí cho ${n} ảnh (${scope==='all'?'tất cả':scope==='p'?'dọc':'ngang'}).`);});
+setStatus(`✔ Đã chép logo ảnh này cho ${n} ảnh (${scope==='all'?'tất cả':scope==='p'?'dọc':'ngang'}).`);});
 // ---- logo (fix SVG không có width/height) ----
 const logoBox=$('logoBox');
 logoBox.onclick=e=>{if(S.pickLogo&&S.logo){pickLogoBg(e);return;}$('logoInput').click();};
@@ -376,7 +387,7 @@ if(!list.length)return setStatus('⚠ File không phải ảnh.');
 const room=Math.max(0,50-S.imgs.length);
 if(!room)return setStatus('⚠ Tối đa 50 ảnh, hãy xuất bớt rồi thêm tiếp.');
 Promise.all(list.slice(0,room).map(f=>new Promise(res=>{const url=URL.createObjectURL(f);const im=new Image();
-im.onload=()=>res({file:f,name:f.name,img:im,url,photo:{...S.photoNew}});im.onerror=()=>{revoke(url);res(null);};im.src=url;})))
+im.onload=()=>res({file:f,name:f.name,img:im,url,photo:{...S.photoNew},logo:{...S.logoNew,custom:null}});im.onerror=()=>{revoke(url);res(null);};im.src=url;})))
 .then(arr=>{const ok=arr.filter(Boolean);S.imgs.push(...ok);S.sel=Math.min(S.sel,Math.max(0,S.imgs.length-1));renderAll();setStatus(`✔ Đã thêm ${ok.length} ảnh (tổng ${S.imgs.length}).`);});}
 function delImg(i){if(S.busy)return;const r=S.imgs[i];if(r)revoke(r.url);S.imgs.splice(i,1);if(i<S.sel)S.sel--;S.sel=Math.max(0,Math.min(S.sel,S.imgs.length-1));renderAll();}
 $('delOne').onclick=()=>{if(S.busy)return;const im=S.imgs[S.sel];if(!im)return setStatus('⚠ Chưa có ảnh nào để xóa.');
@@ -395,8 +406,8 @@ function photoFilter(ph){ph=ph||PHOTO_DEF;const f=[];if(ph.exp)f.push(`brightnes
 function outDims(im){const b=im.crop||{x:0,y:0,w:1,h:1},rot=((im.rot||0)%4+4)%4,st=+im.straight||0;const cw=Math.max(1,Math.round(im.img.naturalWidth*b.w)),ch=Math.max(1,Math.round(im.img.naturalHeight*b.h));let W=rot%2?ch:cw,H=rot%2?cw:ch;if(st){const a=Math.abs(st)*Math.PI/180,c=Math.cos(a),s=Math.sin(a),eW=Math.round(W*c+H*s);H=Math.round(W*s+H*c);W=eW;}return{b,rot,cw,ch,straight:st,W,H};}
 function straightInverse(rx,ry,o){const st=o.straight||0;if(!st)return{x:rx,y:ry};const a=-st*Math.PI/180,dx=rx*o.W-o.W/2,dy=ry*o.H-o.H/2,cx=dx*Math.cos(a)-dy*Math.sin(a),cy=dx*Math.sin(a)+dy*Math.cos(a);const kw=o.rot%2?o.ch:o.cw,kh=o.rot%2?o.cw:o.ch;return{x:(cx+kw/2)/kw,y:(cy+kh/2)/kh};}
 function out2crop(rx,ry,rot){rot=((rot%4)+4)%4;if(rot===1)return{x:ry,y:1-rx};if(rot===2)return{x:1-rx,y:1-ry};if(rot===3)return{x:1-ry,y:rx};return{x:rx,y:ry};}
-function drawMarked(ctx,W,H,img,customPos,px,crop,rot,straight,photo){
-px=px||1;crop=crop||{x:0,y:0,w:1,h:1};rot=((rot||0)%4+4)%4;straight=+straight||0;photo=photo||PHOTO_DEF;
+function drawMarked(ctx,W,H,img,customPos,px,crop,rot,straight,photo,lo){
+px=px||1;crop=crop||{x:0,y:0,w:1,h:1};rot=((rot||0)%4+4)%4;straight=+straight||0;photo=photo||PHOTO_DEF;lo=lo||{...DEF_LOGO,custom:null};
 const sx=crop.x*img.naturalWidth,sy=crop.y*img.naturalHeight,sw=Math.max(1,crop.w*img.naturalWidth),sh=Math.max(1,crop.h*img.naturalHeight);
 const cw=Math.max(1,Math.round(sw)),ch=Math.max(1,Math.round(sh));
 const coreW=rot%2?ch:cw,coreH=rot%2?cw:ch;
@@ -413,11 +424,11 @@ let B=pcv;
 if(straight){B=document.createElement('canvas');B.width=W;B.height=H;const q=B.getContext('2d');const s=Math.max(W/coreW,H/coreH),dw=coreW*s,dh=coreH*s;q.filter='blur(24px)';q.drawImage(pcv,(W-dw)/2,(H-dh)/2,dw,dh);q.filter='none';q.save();q.translate(W/2,H/2);q.rotate(straight*Math.PI/180);q.drawImage(pcv,-coreW/2,-coreH/2);q.restore();}
 ctx.clearRect(0,0,W,H);ctx.drawImage(B,0,0);
 if(!S.logo)return null;
-const m=S.margin/100*Math.min(W,H);
+const m=lo.margin/100*Math.min(W,H);
 const base=S.sizeBase==='min'?Math.min(W,H):S.sizeBase==='max'?Math.max(W,H):S.sizeBase==='h'?H:W;
-const lw0=base*S.size/100, lh0=lw0*(S.logoH/S.logoW);
+const lw0=base*lo.size/100, lh0=lw0*(S.logoH/S.logoW);
 const drawOne=(cx,cy,lw,lh,op,filt)=>{
-ctx.save();ctx.globalAlpha=op/100;ctx.translate(cx,cy);ctx.rotate(S.rot*Math.PI/180);
+ctx.save();ctx.globalAlpha=op/100;ctx.translate(cx,cy);ctx.rotate(lo.rot*Math.PI/180);
 ctx.filter=filt;
 if(S.lborder){const t=Math.max(1,S.lbw/100*lh),sil=logoSil(S.lbcolor);
 for(let a=0;a<8;a++){const an=a/8*Math.PI*2;ctx.drawImage(sil,-lw/2+Math.cos(an)*t,-lh/2+Math.sin(an)*t,lw,lh);}}
@@ -427,20 +438,18 @@ ctx.restore();};
 if(S.tile&&S.logo){ // tile: bỏ smart + text (fix sample sai tọa độ, text lặp rác)
 const gap=S.tileGap/10,stepX=lw0*gap,stepY=lh0*gap;
 ctx.save();ctx.translate(W/2,H/2);ctx.rotate(-Math.PI/8);ctx.translate(-W,-H);
-for(let y=0;y<H*2.4;y+=stepY)for(let x=0;x<W*2.4;x+=stepX)drawOne(x,y,lw0,lh0,Math.min(S.op,35),'none');
+for(let y=0;y<H*2.4;y+=stepY)for(let x=0;x<W*2.4;x+=stepX)drawOne(x,y,lw0,lh0,Math.min(lo.op,35),'none');
 ctx.restore();return null;}
 let lw=lw0,lh=lh0,cx,cy;
 if(customPos){cx=customPos.x*W;cy=customPos.y*H;}
-else{const b=logoXY(W,H,lw,lh,S.pos,m);cx=b.x+lw/2;cy=b.y+lh/2;}
+else{const b=logoXY(W,H,lw,lh,lo.pos,m);cx=b.x+lw/2;cy=b.y+lh/2;}
 let filt='none';
 if(S.smart&&S.logo)filt=lumAt(ctx,(cx-lw/2)*px,(cy-lh/2)*px,lw*px,lh*px)<128?'brightness(0) invert(1)':'brightness(0)';
-drawOne(cx,cy,lw,lh,S.op,filt);
+drawOne(cx,cy,lw,lh,lo.op,filt);
 return{cx,cy,lw,lh};}
 // ---- render: tách editor / grid (fix lag khi kéo + slider) ----
 const ed=$('editor');let drag=false,geom=null;
 function oriOf(im){const r=((im.rot||0)%4+4)%4,w=im.img.naturalWidth,h=im.img.naturalHeight,ew=r%2?h:w,eh=r%2?w:h;return eh>ew?'p':'l';}
-function curCustom(i){return effCustom(S.imgs[i]);}
-function effCustom(im){return oriOf(im)==='p'?S.customP:S.customL;}
 function renderEditor(){
 if(!S.imgs.length){$('edName').textContent='chưa có ảnh';ed.width=640;ed.height=360;
 const c=ed.getContext('2d');c.fillStyle='#000';c.fillRect(0,0,640,360);c.fillStyle='#9aa3b5';c.font='16px Inter,Arial';c.textAlign='center';c.fillText('Thả ảnh vào khung trên để bắt đầu',320,180);geom=null;
@@ -454,9 +463,9 @@ if($('straight')){const st=cur.straight||0;$('straight').value=st;$('vStraight')
 const dispW=Math.min(900,o.W),sc=dispW/o.W;
 ed.width=dispW;ed.height=Math.round(o.H*sc);
 const ctx=ed.getContext('2d');ctx.save();ctx.scale(sc,sc);
-geom=drawMarked(ctx,o.W,o.H,cur.img,effCustom(cur),sc,o.b,o.rot,o.straight,myPhoto(cur));ctx.restore();
+geom=drawMarked(ctx,o.W,o.H,cur.img,myLogo(cur).custom,sc,o.b,o.rot,o.straight,myPhoto(cur),myLogo(cur));ctx.restore();
 drawCropOverlay();
-syncPhotoUI();paintRanges();steps();refreshLock();}
+syncPhotoUI();syncLogoUI();paintRanges();steps();refreshLock();}
 function renderGrid(){
 $('count').textContent=S.imgs.length;
 const nP=S.imgs.filter(im=>oriOf(im)==='p').length;
@@ -470,7 +479,7 @@ S.imgs.forEach((im,i)=>{
 if(S.filter!=='all'&&oriOf(im)!==S.filter)return;shown++;
 const d=document.createElement('div');d.className='thumb'+(i===S.sel?' sel':'');d.title='Bấm để chọn sửa';
 const c=document.createElement('canvas');const o=outDims(im);const tw=300,sc2=tw/o.W;c.width=tw;c.height=Math.max(1,Math.round(o.H*sc2));
-const x=c.getContext('2d');x.save();x.scale(sc2,sc2);drawMarked(x,o.W,o.H,im.img,curCustom(i),sc2,o.b,o.rot,o.straight,myPhoto(im));x.restore();
+const x=c.getContext('2d');x.save();x.scale(sc2,sc2);drawMarked(x,o.W,o.H,im.img,myLogo(im).custom,sc2,o.b,o.rot,o.straight,myPhoto(im),myLogo(im));x.restore();
 const idx=document.createElement('span');idx.className='idx';idx.textContent=String(i+1).padStart(2,'0');
 const mt=document.createElement('div');mt.className='meta';mt.title=im.name;const s1=document.createElement('span');s1.textContent=im.name;const s2=document.createElement('span');s2.textContent=(im.file.size/1024).toFixed(0)+'KB';mt.append(s1,s2);
 const del=document.createElement('button');del.className='x';del.textContent='✕';del.title='Xóa ảnh này';del.onclick=e=>{e.stopPropagation();delImg(i);};
@@ -486,7 +495,7 @@ const cx=geom.cx*sc,cy=geom.cy*sc;
 if(Math.abs(p.x-cx)<geom.lw*sc/2+14&&Math.abs(p.y-cy)<geom.lh*sc/2+14){drag=true;try{ed.setPointerCapture(e.pointerId);}catch(_){}}});
 ed.addEventListener('pointermove',e=>{if(S.cropMode){if(S.cropStart)updateCrop(e);return;}if(!drag)return;const p=evtPos(e);
 const cx0=Math.min(.98,Math.max(.02,p.x/ed.width)),cy0=Math.min(.98,Math.max(.02,p.y/ed.height));
-if(oriOf(S.imgs[S.sel])==='p')S.customP={x:cx0,y:cy0};else S.customL={x:cx0,y:cy0};
+myLogo(S.imgs[S.sel]).custom={x:cx0,y:cy0};
 renderEditor();});
 const endDrag=()=>{if(S.cropMode){S.cropStart=null;return;}if(!drag)return;drag=false;renderGrid();};
 ed.addEventListener('pointerup',endDrag);ed.addEventListener('pointercancel',endDrag);
@@ -546,22 +555,25 @@ ni.src=c.toDataURL('image/png');}
 // ---- export full-res ----
 function renderFull(im){
 const o=outDims(im),c=document.createElement('canvas');c.width=o.W;c.height=o.H;
-drawMarked(c.getContext('2d'),o.W,o.H,im.img,effCustom(im),1,o.b,o.rot,o.straight,myPhoto(im));return c;}
+drawMarked(c.getContext('2d'),o.W,o.H,im.img,myLogo(im).custom,1,o.b,o.rot,o.straight,myPhoto(im),myLogo(im));return c;}
 function outName(im,i){const n=im.name.replace(/\.[^.]+$/,'');const t=($('rename').value||'[Ten_SanPham]_[So_Thu_Tu]').replace('[Ten_SanPham]',n).replace('[So_Thu_Tu]',String(i+1).padStart(2,'0')).replace(/[^\w\-À-ỹ ]/g,'').trim().replace(/\s+/g,'_');const ext=$('fmt').value==='image/png'?'png':$('fmt').value==='image/webp'?'webp':'jpg';return`${t||'anh'}.${ext}`;}
 function setStatus(t){$('status').textContent=t;if(/^[✔⚠↺]/.test(t))toast(t,/^⚠/.test(t));}
 function setBusy(b){S.busy=b;refreshLock();}
 function revoke(u){if(u&&u.indexOf('blob:')===0)try{URL.revokeObjectURL(u)}catch(e){}}
 function saveBlob(b,name){const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);}
+let dlBlob=null,dlURL=null,dlFile='';
+function dlCleanup(){if(dlURL){try{URL.revokeObjectURL(dlURL)}catch(e){}dlURL=null;}dlBlob=null;}
+function closeDl(){if(!$('dlModal'))return;$('dlModal').classList.remove('show');dlCleanup();}
 $('dlOne').onclick=()=>{
 if(S.busy)return;
 if(!S.imgs.length)return setStatus('⚠ Chưa có ảnh.');
-if(!S.logo)return setStatus('⚠ Hãy tải logo trước.');
-setBusy(true);const im=S.imgs[S.sel];renderFull(im).toBlob(b=>{setBusy(false);if(!b)return setStatus('⚠ Xuất lỗi, thử định dạng khác.');const n=outName(im,S.sel);saveBlob(b,n);setStatus('✔ Đã tải '+n);},$('fmt').value,$('quality').value/100);};
+setBusy(true);const im=S.imgs[S.sel],fc=renderFull(im),dims=fc.width+'×'+fc.height;fc.toBlob(b=>{setBusy(false);if(!b)return setStatus('⚠ Xuất lỗi, thử định dạng khác.');dlCleanup();dlBlob=b;dlURL=URL.createObjectURL(b);dlFile=outName(im,S.sel);$('dlPrev').src=dlURL;$('dlName').textContent=dlFile+' • '+dims;$('dlModal').classList.add('show');},$('fmt').value,$('quality').value/100);};
+$('dlGo').onclick=()=>{if(!dlBlob)return;saveBlob(dlBlob,dlFile);setStatus('✔ Đã tải '+dlFile);$('dlModal').classList.remove('show');dlCleanup();};
+$('dlClose').onclick=closeDl;$('dlCancel').onclick=closeDl;
 $('dlZip').onclick=async()=>{
 if(S.busy)return;
 if(!S.imgs.length)return setStatus('⚠ Chưa có ảnh.');
 if(S.imgs.length>10&&!confirm(`Bạn có ${S.imgs.length} ảnh (Free giới hạn 10/lần demo). Vẫn xuất hết?`))return;
-if(!S.logo)return setStatus('⚠ Hãy tải logo trước.');
 if(typeof JSZip==='undefined'){
 setBusy(true);setStatus('⏳ Không tải được thư viện ZIP (cần mạng lần đầu) — chuyển sang tải lẻ từng ảnh…');
 let okN=0;
@@ -582,15 +594,17 @@ const out=await zip.generateAsync({type:'blob'},m=>{prog.value=90+Math.round((m.
 // ---- profiles ----
 function Num(v,d){v=+v;return Number.isFinite(v)?v:d;}
 function logoURL(){try{if(!S.logo)return null;if(S.logoW*S.logoH>640000){toast('⚠ Logo quá to, preset không nhớ logo.',true);return null;}const c=document.createElement('canvas');c.width=S.logoW;c.height=S.logoH;c.getContext('2d').drawImage(S.logo,0,0);return c.toDataURL('image/png');}catch(e){return null;}}
-function getCfg(){return{pos:S.pos,margin:S.margin,size:S.size,rot:S.rot,op:S.op,tile:S.tile,tileGap:S.tileGap,smart:S.smart,lborder:S.lborder,lbcolor:S.lbcolor,lbw:S.lbw,sizeBase:S.sizeBase,customP:S.customP,customL:S.customL,photoNew:{...S.photoNew},logo:logoURL(),rename:$('rename').value,fmt:$('fmt').value,quality:$('quality').value};}
-function setCfg(c){c=c||{};Object.assign(S,{pos:c.pos||'br',margin:Num(c.margin,4),size:Num(c.size,18),rot:Num(c.rot,0),op:Num(c.op,90),tile:!!c.tile,tileGap:Num(c.tileGap,22),smart:!!c.smart,lborder:!!c.lborder,lbcolor:c.lbcolor||'#ffffff',lbw:Num(c.lbw,4),sizeBase:c.sizeBase||'min',customP:c.customP||null,customL:c.customL||null});if(S.tile)S.smart=false;
+function getCfg(){return{tile:S.tile,tileGap:S.tileGap,smart:S.smart,lborder:S.lborder,lbcolor:S.lbcolor,lbw:S.lbw,sizeBase:S.sizeBase,logoNew:{...S.logoNew},photoNew:{...S.photoNew},logo:logoURL(),rename:$('rename').value,fmt:$('fmt').value,quality:$('quality').value};}
+function setCfg(c){c=c||{};Object.assign(S,{tile:!!c.tile,tileGap:Num(c.tileGap,22),smart:!!c.smart,lborder:!!c.lborder,lbcolor:c.lbcolor||'#ffffff',lbw:Num(c.lbw,4),sizeBase:c.sizeBase||'min'});if(S.tile)S.smart=false;
+const oldLogo=c.logoNew||((c.pos||c.margin!==undefined)?{pos:c.pos||'br',margin:Num(c.margin,4),size:Num(c.size,18),rot:Num(c.rot,0),op:Num(c.op,90)}:null);
+S.logoNew={...DEF_LOGO,...(oldLogo||{})};
 const oldPhoto=c.photoNew||c.photoP||(c.exp!==undefined?{exp:Num(c.exp,0),con:Num(c.con,100),high:Num(c.high,0),shad:Num(c.shad,0),sat:Num(c.sat,100),temp:Num(c.temp,0),sharp:Num(c.sharp,0)}:null);
 S.photoNew={...PHOTO_DEF,...(oldPhoto||{})};
 if(c.logo){const im=new Image();im.onload=()=>{revoke(S.logoURL);S.logoURL=null;S.logo=im;S.logoW=im.naturalWidth;S.logoH=im.naturalHeight;S.logoOrig=null;S.logoKey=null;S.pickLogo=false;S._lbCache=null;$('pickBg').textContent='🎯 Tách nền logo';$('cutSw').style.background='';$('logoPrev').src=c.logo;$('logoName').textContent='✔ Logo lấy từ preset';logoBox.classList.remove('pick');logoBox.classList.add('has');paintLogoPrev();renderAll();};im.src=c.logo;}
-$('margin').value=S.margin;$('size').value=S.size;$('rot').value=S.rot;$('op').value=S.op;$('tileGap').value=S.tileGap;$('quality').value=c.quality||92;$('lbw').value=S.lbw;
+$('tileGap').value=S.tileGap;$('quality').value=c.quality||92;$('lbw').value=S.lbw;
 $('smart').checked=S.smart;$('tile').checked=S.tile;$('lborder').checked=S.lborder;$('sizeBase').value=S.sizeBase;$('lbcolor').value=S.lbcolor;$('rename').value=c.rename||'[Ten_SanPham]_[So_Thu_Tu]';$('fmt').value=c.fmt||'image/jpeg';
-$('vMargin').textContent=S.margin+'%';$('vSize').textContent=S.size+'%';$('vRot').textContent=S.rot+'°';$('vOp').textContent=S.op+'%';$('vTile').textContent=(S.tileGap/10).toFixed(1)+'×';$('vQ').textContent=$('quality').value+'%';
-[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===S.pos));syncPhotoUI();paintLogoPrev();renderAll();}
+$('vTile').textContent=(S.tileGap/10).toFixed(1)+'×';$('vQ').textContent=$('quality').value+'%';
+[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===(S.imgs.length?myLogo(S.imgs[Math.min(S.sel,S.imgs.length-1)]).pos:S.logoNew.pos)));syncPhotoUI();syncLogoUI();paintLogoPrev();renderAll();}
 function loadProfiles(){let all;try{all=JSON.parse(localStorage.getItem('logosnap_profiles')||'')}catch(e){all=null;}
 if(!all)all={"Mặc định (Top-Right 80%)":{pos:'tr',margin:4,size:18,rot:0,op:80}};
 const s=$('profile');s.innerHTML='';Object.keys(all).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;s.appendChild(o);});return all;}
@@ -603,7 +617,8 @@ const helpModal=$('helpModal');
 $('helpBtn').onclick=()=>helpModal.classList.add('show');
 $('helpClose').onclick=()=>helpModal.classList.remove('show');
 helpModal.addEventListener('click',e=>{if(e.target===helpModal)helpModal.classList.remove('show');});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){helpModal.classList.remove('show');return;}if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||S.busy)return;if(!S.imgs.length)return;if(e.key==='ArrowRight'){S.sel=(S.sel+1)%S.imgs.length;renderEditor();renderGrid();}else if(e.key==='ArrowLeft'){S.sel=(S.sel-1+S.imgs.length)%S.imgs.length;renderEditor();renderGrid();}else if(e.key==='Delete'||e.key==='Backspace'){delImg(S.sel);setStatus(`✔ Đã xóa (còn ${S.imgs.length} ảnh).`);}});
+$('dlModal').addEventListener('click',e=>{if(e.target===$('dlModal'))closeDl();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){helpModal.classList.remove('show');closeDl();return;}if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||S.busy)return;if(!S.imgs.length)return;if(e.key==='ArrowRight'){S.sel=(S.sel+1)%S.imgs.length;renderEditor();renderGrid();}else if(e.key==='ArrowLeft'){S.sel=(S.sel-1+S.imgs.length)%S.imgs.length;renderEditor();renderGrid();}else if(e.key==='Delete'||e.key==='Backspace'){delImg(S.sel);setStatus(`✔ Đã xóa (còn ${S.imgs.length} ảnh).`);}});
 renderAll();
 </script>
 </body>
