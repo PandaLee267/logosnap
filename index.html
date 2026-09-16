@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PandaLee — Đóng dấu logo hàng loạt, 100% trên trình duyệt</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐼</text></svg>">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#08090d;--panel:#10131b;--panel2:#161b28;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);
+--txt:#f2f4f8;--mut:#8f97ab;--acc:#22c55e;--acc2:#4ade80;--acc-dim:rgba(34,197,94,.13);--blue:#38bdf8;--warn:#fbbf24;--err:#f87171;--r:14px;--shadow:0 10px 30px rgba(0,0,0,.45)}
+body{background:radial-gradient(1100px 480px at 85% -10%,rgba(34,197,94,.09),transparent 60%),radial-gradient(800px 400px at 5% 0%,rgba(56,189,248,.07),transparent 60%),var(--bg);color:var(--txt);font-family:Inter,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;min-height:100dvh;font-size:14px;-webkit-font-smoothing:antialiased}
+::selection{background:rgba(34,197,94,.35)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+/* header */
+header{display:flex;align-items:center;gap:14px;padding:10px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(8,9,13,.85);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);z-index:5;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#e8f5e9,#bbdefb);display:grid;place-items:center;font-size:24px;flex:none;box-shadow:0 4px 18px rgba(34,197,94,.35)}
+.brand b{font-size:16px;letter-spacing:-.01em}
+.badge{font-size:11px;background:rgba(255,255,255,.05);border:1px solid var(--line);padding:4px 10px;border-radius:99px;color:var(--mut);white-space:nowrap}
+.steps{display:flex;gap:4px;margin:0 auto;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:99px;padding:4px}
+.step{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--mut);padding:6px 14px;border-radius:99px;white-space:nowrap}
+.step i{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700}
+.step.active{color:var(--txt);background:rgba(255,255,255,.07)}
+.step.active i{background:var(--acc);color:#052e16}
+.step.done{color:var(--acc2)}
+.step.done i{background:var(--acc-dim);color:var(--acc2)}
+.hact{display:flex;gap:8px;align-items:center;margin-left:auto;flex-wrap:wrap}
+.hact select{flex:1 1 150px;min-width:0}
+/* layout */
+.layout{display:grid;grid-template-columns:308px 1fr;min-height:calc(100vh - 57px)}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:14px;overflow:auto}
+main{padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0;max-width:1400px;width:100%;margin:0 auto}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.025),transparent 40%),var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.card>h3,.chead h3{font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut);margin-bottom:10px;font-weight:700}
+.card>h3::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acc);margin-right:8px;box-shadow:0 0 10px var(--acc)}
+.chead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.chead h3{margin:0}
+.chead h3::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acc);margin-right:8px;box-shadow:0 0 10px var(--acc)}
+label.lbl{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin:12px 0 6px;color:#c9cfdb}
+label.lbl b{color:var(--acc2);font-variant-numeric:tabular-nums}
+/* inputs */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:99px;background:linear-gradient(90deg,var(--acc) var(--fill,50%),rgba(255,255,255,.1) var(--fill,50%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;margin-top:-5px;box-shadow:0 0 0 4px rgba(34,197,94,.25),0 2px 8px rgba(0,0,0,.5)}
+input[type=range]::-moz-range-track{height:6px;border-radius:99px;background:rgba(255,255,255,.1)}
+input[type=range]::-moz-range-progress{height:6px;border-radius:99px;background:var(--acc)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(34,197,94,.25)}
+input[type=text],select{width:100%;background:#0a0d13;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:9px 11px;font:inherit;font-size:13px;outline:none;transition:border .15s}
+input[type=text]:focus,select:focus{border-color:var(--acc)}
+input[type=color]{width:38px;height:30px;border:1px solid var(--line2);border-radius:8px;background:#0a0d13;padding:2px;cursor:pointer}
+/* buttons */
+.btn{cursor:pointer;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font:inherit;font-weight:700;font-size:13px;background:var(--panel2);color:var(--txt);transition:transform .08s,filter .15s,border .15s}
+.btn:hover{filter:brightness(1.25);border-color:var(--line2)}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:linear-gradient(180deg,var(--acc2),var(--acc));color:#052e16;border:0;box-shadow:0 6px 22px rgba(34,197,94,.35)}
+.btn.pri:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent;padding:6px 12px;font-size:12px}
+.btn.danger{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.4);color:#fca5a5}
+.btn.danger:hover{background:rgba(248,113,113,.22);border-color:var(--err);filter:none}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.pos9{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pos9 button{aspect-ratio:1.7;border-radius:10px;border:1px solid var(--line);background:#0a0d13;color:var(--mut);cursor:pointer;font-size:15px;transition:all .12s}
+.pos9 button:hover{border-color:var(--line2);color:var(--txt)}
+.pos9 button.on{background:var(--acc-dim);color:var(--acc2);border-color:var(--acc)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+/* dropzone */
+.drop{border:1.5px dashed rgba(255,255,255,.18);border-radius:18px;padding:30px 20px;text-align:center;color:var(--mut);background:rgba(255,255,255,.015);cursor:pointer;transition:all .18s}
+.drop:hover{border-color:rgba(34,197,94,.5)}
+.drop.over{border-color:var(--acc);background:var(--acc-dim);color:var(--txt);transform:scale(1.005)}
+.dz-icon{font-size:38px;margin-bottom:8px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))}
+.drop b{color:var(--txt);font-size:15px}
+/* editor + grid */
+#editorWrap{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:start}
+#editor{max-width:100%;height:auto;display:block;border-radius:12px;cursor:move;touch-action:none;border:1px solid var(--line);background:repeating-conic-gradient(#1c2230 0 25%,#11141c 0 50%) 0 0/22px 22px}
+.edfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px}
+#edName{word-break:break-all;color:var(--mut);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.chips{display:flex;gap:6px;margin-bottom:10px}
+.chips button{flex:1;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--mut);border-radius:9px;padding:7px 4px;font:inherit;font-size:12px;font-weight:700}
+.chips button.on{background:var(--acc-dim);color:var(--acc2);border-color:var(--acc)}
+.grid .empty{text-align:center;padding:26px 10px;color:var(--mut);font-size:13px}
+.thumb{position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#000;cursor:pointer;transition:transform .12s,border .12s}
+.thumb:hover{transform:translateY(-2px);border-color:var(--line2)}
+.thumb.sel{outline:2px solid var(--acc);outline-offset:1px}
+.thumb canvas{width:100%;display:block;background:repeating-conic-gradient(#1c2230 0 25%,#11141c 0 50%) 0 0/16px 16px}
+.thumb .idx{position:absolute;top:6px;left:6px;font-size:11px;font-weight:700;background:rgba(0,0,0,.7);border-radius:7px;padding:2px 8px}
+.thumb.sel .idx{background:var(--acc);color:#052e16}
+.thumb .meta{position:absolute;left:0;right:0;bottom:0;font-size:11px;padding:4px 8px;background:linear-gradient(transparent,rgba(0,0,0,.8));display:flex;justify-content:space-between;gap:6px}
+.thumb .meta span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.thumb .x{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:1px solid var(--line);color:#fff;border-radius:7px;padding:2px 8px;cursor:pointer;font-size:12px}
+.thumb .x:hover{background:var(--err);border-color:var(--err)}
+/* bottom + toast + footer */
+.bottombar{position:sticky;bottom:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:rgba(13,16,23,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line2);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow)}
+.bottombar>.btn{flex:1 1 150px}
+#status{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:12.5px}
+#status::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--acc);flex:none;box-shadow:0 0 8px var(--acc)}
+#toast{position:fixed;right:18px;bottom:18px;max-width:min(360px,90vw);background:#151a26;border:1px solid var(--line2);border-left:3px solid var(--acc);color:var(--txt);font-size:13px;border-radius:12px;padding:12px 16px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;z-index:50}
+#toast.show{opacity:1;transform:none}
+#toast.err{border-left-color:var(--err)}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:6px 10px 20px;grid-column:1/-1}
+footer b{color:var(--acc2)}
+/* logo box */
+.switch{display:flex;align-items:center;gap:8px;font-size:13px;color:#c9cfdb}
+.switch input{accent-color:var(--acc);width:15px;height:15px}
+small.hint{color:var(--mut);font-size:12px;line-height:1.5}
+#logoBox{margin-top:8px;border:1.5px dashed rgba(255,255,255,.18);border-radius:12px;min-height:92px;display:grid;place-items:center;cursor:pointer;background:repeating-conic-gradient(#2b3449 0 25%,#141926 0 50%) 0 0/18px 18px;overflow:hidden;padding:8px;transition:border .15s;position:relative}
+#logoBox:hover{border-color:rgba(34,197,94,.5)}
+#logoBox.over{border-color:var(--acc);background:var(--acc-dim)}
+#logoBox.pick{cursor:crosshair;border-color:var(--acc)}
+#logoBox.light{background:repeating-conic-gradient(#ffffff 0 25%,#cdd3dd 0 50%) 0 0/18px 18px}
+#logoBox img{max-width:100%;max-height:150px;display:none;background:transparent;filter:drop-shadow(0 1px 5px rgba(0,0,0,.65)) drop-shadow(0 0 1px rgba(255,255,255,.4));image-rendering:auto}
+#logoBox span{font-size:12px;color:var(--mut);text-align:center;line-height:1.6}
+#logoBox.has img{display:block}
+#logoBox.has span{display:none}
+.logodel{display:none;position:absolute;top:6px;right:6px;background:rgba(0,0,0,.7);border:1px solid var(--line);color:#fff;border-radius:7px;padding:2px 8px;cursor:pointer;font-size:12px}
+.logodel:hover{background:var(--err);border-color:var(--err)}
+#logoBox.has .logodel{display:block}
+#cutSw{min-height:38px;border:1px solid var(--line);border-radius:10px;background:repeating-conic-gradient(#1c2230 0 25%,#11141c 0 50%) 0 0/14px 14px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:none;place-items:center;z-index:60;padding:18px}
+.overlay.show{display:grid}
+.sheet{background:var(--panel);border:1px solid var(--line2);border-radius:18px;max-width:640px;width:100%;max-height:86vh;overflow:auto;padding:22px;box-shadow:var(--shadow)}
+.sheet h3{margin:16px 0 8px;font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--mut);font-weight:700}
+.sheet h3:first-child{margin-top:0}
+.steps-list{margin:0 0 6px 20px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;line-height:1.55;color:#d5dae4}
+.steps-list b{color:var(--acc2)}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12.5px;line-height:1.5;color:#c9cfdb}
+.feat-grid>div{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.feat-grid b{color:var(--txt)}
+@media(max-width:640px){.feat-grid{grid-template-columns:1fr}}
+.tcolor-row{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;color:#c9cfdb}
+@media(max-width:960px){.layout{grid-template-columns:1fr}aside{border-right:0;border-bottom:0;border-top:1px solid var(--line);order:2}main{order:1}#editorWrap{grid-template-columns:1fr}.steps{display:none}main{padding:14px}}
+@media(max-width:480px){.grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}header{padding:10px 12px}main{padding:10px}.drop{padding:22px 14px}}
+input:disabled,select:disabled{opacity:.4}
+</style>
+</head>
+<body>
+<header>
+<div class="brand"><div class="logo">🐼</div><div><b>PandaLee</b><br><span class="badge">🔒 100% client-side • Ảnh không rời khỏi máy bạn</span></div></div>
+<nav class="steps">
+<div class="step" id="st1"><i>1</i>Logo</div>
+<div class="step" id="st2"><i>2</i>Ảnh</div>
+<div class="step" id="st3"><i>3</i>Chỉnh</div>
+<div class="step" id="st4"><i>4</i>Xuất file</div>
+</nav>
+<div class="hact">
+<select id="profile" style="width:190px" title="Bộ cấu hình thương hiệu đã lưu"></select>
+<button class="btn" id="saveProfile" title="Lưu cấu hình hiện tại thành preset">💾 Preset</button>
+<button class="btn danger" id="delProfile" title="Xóa preset đang chọn">✕</button>
+<button class="btn ghost" id="helpBtn" title="Hướng dẫn sử dụng">❓ Hướng dẫn</button>
+</div>
+</header>
+<div class="layout">
+<aside>
+<div class="card"><h3>1 • Logo</h3>
+<div id="logoBox" title="Bấm để đổi logo • Bật Tách nền rồi bấm vào nền logo để tách"><span>🐼 Thả / bấm để thêm logo<br>(PNG trong suốt / SVG)</span><img id="logoPrev" alt="logo preview"><button class="logodel" id="logoDel" title="Xóa logo này, thêm logo khác">✕ Xóa</button></div>
+<input type="file" id="logoInput" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
+<small class="hint" id="logoName">Chưa có logo.</small>
+<div class="row" style="margin-top:8px"><button class="btn" id="pickBg" style="flex:1">🎯 Tách nền logo</button><button class="btn ghost" id="logoBg" title="Đổi nền ô xem thử sáng/tối để thấy rõ logo trắng/đen" style="flex:0 0 auto">◐ Nền</button></div>
+<small class="hint">Logo nền trắng/nền màu? Bật rồi bấm vào vùng nền trong ô logo trên.</small>
+<label class="lbl">Ngưỡng tách <b id="vCut">30%</b></label><input type="range" id="cutTol" min="5" max="90" value="30">
+<div class="row" style="margin-top:8px"><button class="btn" id="cutUndo">↩ Hoàn tác</button><div id="cutSw" title="Màu nền logo đã tách"></div></div>
+<label class="switch" style="margin-top:10px"><input type="checkbox" id="lborder"> Viền ôm quanh logo</label>
+<div class="tcolor-row">Màu viền <input type="color" id="lbcolor" value="#ffffff" title="Màu viền logo"></div>
+<label class="lbl">Độ dày viền <b id="vLbw">4%</b></label><input type="range" id="lbw" min="1" max="15" value="4">
+<label class="switch" style="margin-top:8px"><input type="checkbox" id="smart"> AI: tự đổi Trắng ↔ Đen theo nền</label>
+</div>
+<div class="card"><h3>2 • Vị trí & lề</h3>
+<div class="pos9" id="pos9"></div>
+<label class="lbl">Lề (padding) <b id="vMargin">4%</b></label>
+<input type="range" id="margin" min="0" max="15" value="4" step="0.5">
+<small class="hint">Mẹo: kéo logo ngay trên ảnh lớn để đặt tự do. Nút “↺ Về preset 9 điểm” để quay về lưới cố định.</small>
+<div class="row" style="margin-top:8px"><button class="btn" id="resetPos">↺ Về preset 9 điểm</button></div>
+<label class="lbl">Áp dụng vị trí đã kéo cho</label>
+<div class="row"><button class="btn" data-apply="all">Tất cả</button><button class="btn" data-apply="p">Ảnh dọc</button><button class="btn" data-apply="l">Ảnh ngang</button></div>
+<small class="hint">Vị trí tự nhớ riêng từng nhóm: kéo trên 1 ảnh dọc là mọi ảnh dọc ăn theo (vuông tính vào ngang).</small>
+</div>
+<div class="card"><h3>3 • Kích thước • Xoay • Đậm</h3>
+<label class="lbl">Tỉ lệ logo / ảnh <b id="vSize">18%</b></label><input type="range" id="size" min="3" max="60" value="18">
+<label class="lbl">Tính tỉ lệ theo</label><select id="sizeBase" title="Tự động đều logo mọi ảnh dọc + ngang"><option value="min" selected>Cạnh ngắn (tự đều dọc + ngang)</option><option value="w">Chiều rộng</option><option value="max">Cạnh dài</option><option value="h">Chiều cao</option></select>
+<label class="lbl">Xoay <b id="vRot">0°</b></label><input type="range" id="rot" min="-45" max="45" value="0">
+<label class="lbl">Độ đậm (opacity) <b id="vOp">90%</b></label><input type="range" id="op" min="5" max="100" value="90">
+<label class="switch"><input type="checkbox" id="tile"> Pattern/Tile: phủ kín lưới chéo</label>
+<label class="lbl">Khoảng Tile <b id="vTile">2.2×</b></label><input type="range" id="tileGap" min="13" max="40" value="22">
+</div>
+<div class="card"><h3>4 • Xuất file</h3>
+<label class="lbl">Nén ảnh (JPG/WebP quality) <b id="vQ">92%</b></label><input type="range" id="quality" min="40" max="100" value="92">
+<small class="hint">Quality chỉ áp dụng cho JPG/WebP (PNG luôn nét nhất).</small>
+<label class="lbl">Đổi tên hàng loạt</label><input type="text" id="rename" value="[Ten_SanPham]_[So_Thu_Tu]">
+<small class="hint">[Ten_SanPham] = tên file gốc, [So_Thu_Tu] = 01, 02…</small>
+<label class="lbl">Định dạng xuất</label><select id="fmt"><option value="image/jpeg">JPG (nhẹ, up Shopee/web)</option><option value="image/png">PNG (nét nhất)</option><option value="image/webp">WebP (nhẹ + nét)</option></select>
+<div class="row" style="margin-top:10px"><button class="btn ghost" id="resetCfg">↺ Về cấu hình mặc định</button></div>
+</div>
+</aside>
+<main>
+<div class="drop" id="drop">
+<div class="dz-icon">🖼️</div>
+<div><b>Kéo-thả ảnh vào đây</b><br><small class="hint">PNG • JPG • WEBP — xử lý ngay trên máy, không upload</small></div>
+<div class="row" style="max-width:280px;margin:14px auto 0"><button class="btn pri" id="addImgs">＋ Thêm ảnh</button></div>
+<input type="file" id="imgs" accept="image/png,image/jpeg,image/webp" multiple hidden>
+</div>
+<div id="editorWrap">
+<div class="card">
+<div class="chead"><h3>Editor — kéo logo trực tiếp</h3><button class="btn ghost" id="cmpBtn" title="Giữ để xem ảnh gốc không logo">👁 Giữ xem gốc</button></div>
+<canvas id="editor"></canvas>
+<div class="edfoot"><small class="hint" id="edName">chưa có ảnh</small></div>
+</div>
+<div class="card"><div class="chead"><h3>Xem trước (<span id="count">0</span> ảnh)</h3><button class="btn ghost" id="addGrid">＋ Thêm</button></div><div class="chips"><button data-f="all" class="on">Tất cả</button><button data-f="p">Dọc</button><button data-f="l">Ngang</button></div><div class="grid" id="grid"></div></div>
+</div>
+<div class="bottombar">
+<button class="btn pri" id="dlZip">⬇ Tải tất cả (.ZIP)</button>
+<button class="btn" id="dlOne">⬇ Tải ảnh đang chọn</button>
+<button class="btn" id="delOne">🗑 Xóa ảnh này</button>
+<button class="btn danger" id="clear">Xóa hết</button>
+<small class="hint" id="status">Xử lý 100% bằng Canvas trên máy bạn — không upload server.</small>
+<progress id="zipProg" max="100" value="0" hidden style="width:100%;height:6px;accent-color:var(--acc)"></progress>
+</div>
+</main>
+<footer>🐼 PandaLee — đóng dấu logo hàng loạt, ảnh <b>không rời khỏi máy bạn</b> • Mẹo: lưu <b>Preset</b> để lần sau thả ảnh vào là xong<br><small class="hint">Phát triển bởi <b>PandaLee</b> • © 2026</small></footer>
+</div>
+<div id="toast"></div>
+<div class="overlay" id="helpModal">
+<div class="sheet">
+<div class="chead"><h3>❓ Hướng dẫn sử dụng PandaLee</h3><button class="btn ghost" id="helpClose">✕ Đóng</button></div>
+<ol class="steps-list">
+<li><b>Thêm logo</b> — bấm / kéo-thả file vào ô Logo (card 1). Logo nền trắng? Bật <b>🎯 Tách nền logo</b> rồi bấm vào vùng nền trong ô để tách thành trong suốt.</li>
+<li><b>Thêm ảnh</b> — bấm <b>＋ Thêm ảnh</b> hoặc kéo-thả nhiều ảnh vào khung (tối đa 50 ảnh, free demo 10 ảnh/lần xuất). Dùng nút <b>Tất cả / Ảnh dọc / Ảnh ngang</b> trên lưới để lọc từng nhóm mà chỉnh.</li>
+<li><b>Chỉnh logo</b> — chọn 1 trong 9 điểm đặt, hoặc <b>kéo trực tiếp logo trên ảnh lớn</b>. Chỉnh tỉ lệ (đã tự đều cả dọc + ngang), xoay, độ đậm, lề. Nút <b>↺ Về preset 9 điểm</b> để hủy vị trí kéo tay.</li>
+<li><b>Áp dụng vị trí</b> — vị trí tự nhớ riêng từng nhóm: kéo logo trên 1 ảnh dọc là mọi ảnh dọc ăn theo ngay. Ba nút <b>Tất cả / Ảnh dọc / Ảnh ngang</b> (card 2) để copy vị trí nhóm này sang nhóm khác.</li>
+<li><b>Xuất file</b> — <b>⬇ Tải tất cả (.ZIP)</b> hoặc tải lẻ ảnh đang chọn. Mất mạng vẫn tải lẻ từng ảnh được. Đặt tên hàng loạt, chọn JPG (nhẹ) / PNG (nét, giữ nền trong suốt) / WebP.</li>
+</ol>
+<h3>Tính năng nâng cao</h3>
+<div class="feat-grid">
+<div><b>◈ Viền logo</b><br>Bật viền ôm theo hình logo, chọn màu + độ dày.</div>
+<div><b>◈ AI đổi màu</b><br>Tự đổi logo Trắng ↔ Đen theo độ sáng nền ảnh.</div>
+<div><b>◈ Pattern/Tile</b><br>Phủ kín logo mờ dạng lưới chéo chống copy.</div>
+<div><b>◈ Preset</b><br>Lưu cấu hình + logo → lần sau chọn preset, thả ảnh là xong.</div>
+<div><b>◈ 👁 Giữ xem gốc</b><br>Giữ nút để so ảnh trước/sau khi đóng dấu.</div>
+</div>
+<h3>Mẹo</h3>
+<small class="hint">• Logo đã tách nền + xuất PNG mới giữ được nền trong suốt (JPG thành nền đen).<br>• Không thấy tính năng mới? Nhấn <b>Ctrl+F5</b> để tải lại trang.<br>• Mọi xử lý chạy trên máy bạn — ảnh không upload đi đâu.<br>• Preset nhớ cả logo (nhỏ gọn) + vị trí dọc/ngang — mở lên là dùng ngay.<br>• Chỉnh loạn? Bấm <b>↺ Về cấu hình mặc định</b> (cuối card 4, giữ nguyên logo + ảnh).<br>• <b>Xóa ảnh này</b> chỉ xóa ảnh đang chọn; <b>Xóa hết</b> có hỏi lại trước khi xóa.<br>• PandaLee © 2026 — phát triển bởi <b>PandaLee</b>.</small>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const S={imgs:[],sel:0,logo:null,logoW:0,logoH:0,logoOrig:null,logoKey:null,pickLogo:false,cutTol:30,lborder:false,lbcolor:'#ffffff',lbw:4,_lbCache:null,busy:false,sizeBase:'min',pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,customP:null,customL:null,filter:'all'};
+const POS={tl:[0,0],tc:[.5,0],tr:[1,0],ml:[0,.5],mc:[.5,.5],mr:[1,.5],bl:[0,1],bc:[.5,1],br:[1,1]};
+const ICONS={tl:'↖',tc:'↑',tr:'↗',ml:'←',mc:'•',mr:'→',bl:'↙',bc:'↓',br:'↘'};
+const p9=$('pos9');Object.keys(POS).forEach(k=>{const b=document.createElement('button');b.textContent=ICONS[k];b.dataset.k=k;if(k==='br')b.classList.add('on');b.onclick=()=>{S.pos=k;S.customP=S.customL=null;[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===k));renderAll();};p9.appendChild(b);});
+let gt=null;function queueGrid(){clearTimeout(gt);gt=setTimeout(renderGrid,150);}
+function paintRanges(){document.querySelectorAll('input[type=range]').forEach(el=>{el.style.setProperty('--fill',((el.value-el.min)/(el.max-el.min)*100)+'%');});}
+let toastT=null;function toast(m,err){const t=$('toast');t.textContent=m;t.className='show'+(err?' err':'');clearTimeout(toastT);toastT=setTimeout(()=>t.className='',2800);}
+function steps(){const hasL=!!S.logo,hasI=S.imgs.length>0;const st=$('st1');if(!st)return;
+const map=[['st1',hasL],['st2',hasI],['st3',hasL&&hasI],['st4',hasL&&hasI]];
+let actSet=false;map.forEach(([id,done])=>{const el=$(id);el.classList.toggle('done',done);
+el.classList.toggle('active',!done&&!actSet);if(!done)actSet=true;});}
+const LOGO_CTL=['margin','size','rot','op','tileGap','lbw','cutTol','sizeBase','smart','tile','lborder','lbcolor','pickBg','cutUndo','resetPos','cmpBtn'];
+function refreshLock(){
+const hasL=!!S.logo,hasI=S.imgs.length>0;
+LOGO_CTL.forEach(id=>{const el=$(id);if(el)el.disabled=!hasL;});
+[...p9.children].forEach(b=>b.disabled=!hasL);
+document.querySelectorAll('[data-apply]').forEach(b=>b.disabled=!hasL||!hasI);
+$('dlZip').disabled=$('dlOne').disabled=S.busy||!hasI||!hasL;
+$('delOne').disabled=$('clear').disabled=S.busy||!hasI;if(S.tile&&hasL){$('smart').disabled=true;}}
+function bind(id,key,label,fmt){$(id).oninput=e=>{S[key]=+e.target.value;$(label).textContent=fmt(S[key]);renderEditor();queueGrid();};}
+bind('size','size','vSize',v=>v+'%');bind('rot','rot','vRot',v=>v+'°');bind('op','op','vOp',v=>v+'%');
+bind('margin','margin','vMargin',v=>v+'%');bind('tileGap','tileGap','vTile',v=>(v/10).toFixed(1)+'×');bind('quality','quality','vQ',v=>v+'%');
+$('lbw').oninput=e=>{S.lbw=+e.target.value;$('vLbw').textContent=S.lbw+'%';if(!S.lborder){S.lborder=true;$('lborder').checked=true;}paintLogoPrev();renderEditor();queueGrid();};
+$('lborder').onchange=e=>{S.lborder=e.target.checked;paintLogoPrev();renderEditor();queueGrid();};
+$('lbcolor').oninput=e=>{S.lbcolor=e.target.value;S._lbCache=null;if(!S.lborder){S.lborder=true;$('lborder').checked=true;}paintLogoPrev();renderEditor();queueGrid();};
+$('smart').onchange=e=>{S.smart=e.target.checked;renderEditor();queueGrid();};
+$('tile').onchange=e=>{S.tile=e.target.checked;if(S.tile){S.smart=false;$('smart').checked=false;}refreshLock();renderEditor();queueGrid();};
+$('sizeBase').onchange=e=>{S.sizeBase=e.target.value;renderEditor();queueGrid();};
+$('resetPos').onclick=()=>{S.customP=S.customL=null;renderAll();setStatus('↺ Đã về vị trí preset.');};
+const DEFAULTS={pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,lborder:false,lbcolor:'#ffffff',lbw:4,sizeBase:'min',customP:null,customL:null};
+$('resetCfg').onclick=()=>{setCfg({...DEFAULTS});setStatus('↺ Đã về cấu hình mặc định (giữ nguyên logo + ảnh).');};
+document.querySelectorAll('[data-apply]').forEach(b=>b.onclick=()=>{
+if(!S.imgs.length)return setStatus('⚠ Chưa có ảnh.');
+const scope=b.dataset.apply;
+const g=effCustom(S.imgs[S.sel]);
+if(!g)return setStatus('⚠ Kéo logo trên ảnh lớn trước, rồi mới áp dụng.');
+const match=im=>scope==='all'||oriOf(im)===scope;
+if(scope==='all'||scope==='p')S.customP={...g};
+if(scope==='all'||scope==='l')S.customL={...g};
+renderAll();
+const n=S.imgs.filter(match).length;
+setStatus(`✔ Đã áp vị trí cho ${n} ảnh (${scope==='all'?'tất cả':scope==='p'?'dọc':'ngang'}).`);});
+// ---- logo (fix SVG không có width/height) ----
+const logoBox=$('logoBox');
+logoBox.onclick=e=>{if(S.pickLogo&&S.logo){pickLogoBg(e);return;}$('logoInput').click();};
+['dragover','dragenter'].forEach(ev=>logoBox.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();logoBox.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>logoBox.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();logoBox.classList.remove('over');}));
+logoBox.addEventListener('drop',e=>loadLogo(e.dataTransfer.files[0]));
+$('logoDel').onclick=e=>{e.stopPropagation();revoke(S.logoURL);S.logoURL=null;
+S.logo=null;S.logoW=S.logoH=0;S.logoOrig=null;S.logoKey=null;S.pickLogo=false;S._lbCache=null;
+logoBox.classList.remove('has','pick');$('logoPrev').removeAttribute('src');
+$('logoName').textContent='Chưa có logo.';$('pickBg').textContent='🎯 Tách nền logo';$('cutSw').style.background='';
+paintLogoPrev();renderEditor();queueGrid();setStatus('🗑 Đã xóa logo — bấm vào ô để thêm logo khác.');};
+$('logoInput').onchange=e=>{loadLogo(e.target.files[0]);e.target.value='';};
+function paintLogoPrev(){const p=$('logoPrev');if(!S.logo){p.style.filter='';return;}if(!S.lborder){p.style.filter='drop-shadow(0 1px 5px rgba(0,0,0,.65)) drop-shadow(0 0 1px rgba(255,255,255,.4))';return;}const h=p.clientHeight||120,t=Math.max(1,S.lbw/100*h),d=(t*0.7).toFixed(1)+'px',c=S.lbcolor,tpx=t.toFixed(1)+'px';p.style.filter=`drop-shadow(${tpx} 0 0 ${c}) drop-shadow(-${tpx} 0 0 ${c}) drop-shadow(0 ${tpx} 0 ${c}) drop-shadow(0 -${tpx} 0 ${c}) drop-shadow(${d} ${d} 0 ${c}) drop-shadow(-${d} ${d} 0 ${c}) drop-shadow(${d} -${d} 0 ${c}) drop-shadow(-${d} -${d} 0 ${c})`;}
+async function loadLogo(f){
+if(!f)return;let blob=f;
+if(/svg/i.test(f.type)||/\.svg$/i.test(f.name)){
+try{let t=await f.text();if(!/width\s*=/i.test(t))t=t.replace(/<svg([^>]*)>/i,'<svg$1 width="800" height="800">');blob=new Blob([t],{type:'image/svg+xml'});}catch(e){}}
+const url=URL.createObjectURL(blob);revoke(S.logoURL);S.logoURL=url;const im=new Image();
+im.onload=()=>{if(!im.naturalWidth){revoke(url);if(S.logoURL===url)S.logoURL=null;setStatus('⚠ File logo lỗi, hãy thử PNG.');return;}
+S.logo=im;S.logoW=im.naturalWidth;S.logoH=im.naturalHeight;
+S.logoOrig=null;S.logoKey=null;S.pickLogo=false;S._lbCache=null;logoBox.classList.remove('pick');
+$('pickBg').textContent='🎯 Tách nền logo';$('cutSw').style.background='';
+$('logoName').textContent=`✔ ${f.name} (${S.logoW}×${S.logoH})`;
+$('logoPrev').src=url;logoBox.classList.add('has');paintLogoPrev();renderEditor();queueGrid();};
+im.onerror=()=>{revoke(url);if(S.logoURL===url)S.logoURL=null;setStatus('⚠ Không đọc được file logo.');};im.src=url;}
+// ---- images (giữ đúng thứ tự, chống drop ngoài vùng) ----
+window.addEventListener('dragover',e=>e.preventDefault());
+window.addEventListener('drop',e=>e.preventDefault());
+$('drop').onclick=e=>{if(e.target.closest('button'))return;$('imgs').click();};
+$('addImgs').onclick=e=>{e.stopPropagation();$('imgs').click();};
+$('addGrid').onclick=e=>{e.stopPropagation();$('imgs').click();};
+document.querySelectorAll('.chips button').forEach(b=>b.onclick=()=>{S.filter=b.dataset.f;renderGrid();});
+$('imgs').onchange=e=>{addFiles(e.target.files);e.target.value='';};
+['dragover','dragenter'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.add('over');}));
+['dragleave','drop'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.remove('over');}));
+$('drop').addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+function addFiles(fs){
+const list=[...fs].filter(f=>f.type.startsWith('image/'));
+if(!list.length)return setStatus('⚠ File không phải ảnh.');
+const room=Math.max(0,50-S.imgs.length);
+if(!room)return setStatus('⚠ Tối đa 50 ảnh, hãy xuất bớt rồi thêm tiếp.');
+Promise.all(list.slice(0,room).map(f=>new Promise(res=>{const url=URL.createObjectURL(f);const im=new Image();
+im.onload=()=>res({file:f,name:f.name,img:im,url});im.onerror=()=>{revoke(url);res(null);};im.src=url;})))
+.then(arr=>{const ok=arr.filter(Boolean);S.imgs.push(...ok);S.sel=Math.min(S.sel,Math.max(0,S.imgs.length-1));renderAll();setStatus(`✔ Đã thêm ${ok.length} ảnh (tổng ${S.imgs.length}).`);});}
+function delImg(i){const r=S.imgs[i];if(r)revoke(r.url);S.imgs.splice(i,1);if(i<S.sel)S.sel--;S.sel=Math.max(0,Math.min(S.sel,S.imgs.length-1));renderAll();}
+$('delOne').onclick=()=>{if(S.busy)return;const im=S.imgs[S.sel];if(!im)return setStatus('⚠ Chưa có ảnh nào để xóa.');
+const n=im.name;delImg(S.sel);setStatus(`✔ Đã xóa ${n} (còn ${S.imgs.length} ảnh).`);};
+$('clear').onclick=()=>{if(S.busy)return;if(!S.imgs.length)return;if(!confirm(`Xóa hết ${S.imgs.length} ảnh?`))return;
+S.imgs.forEach(r=>revoke(r.url));S.imgs=[];S.sel=0;S.filter='all';renderAll();setStatus('Đã xóa hết ảnh.');};
+// ---- core draw: img là tham số (fix thumb nào cũng vẽ ảnh đang chọn) ----
+function lumAt(ctx,x,y,w,h){try{const d=ctx.getImageData(Math.max(0,x|0),Math.max(0,y|0),Math.max(1,w|0),Math.max(1,h|0)).data;let s=0,n=0;for(let i=0;i<d.length;i+=24){s+=.299*d[i]+.587*d[i+1]+.114*d[i+2];n++;}return n?s/n:255;}catch(e){return 255;}}
+function logoXY(W,H,lw,lh,pos,m){const[a,b]=POS[pos];return{x:a*(W-lw)+(a===0?m:a===1?-m:0),y:b*(H-lh)+(b===0?m:b===1?-m:0)};}
+function logoSil(color){
+if(S._lbCache&&S._lbCache.color===color&&S._lbCache.src===S.logo)return S._lbCache.cv;
+const c=document.createElement('canvas');c.width=Math.max(1,S.logoW);c.height=Math.max(1,S.logoH);
+const x=c.getContext('2d');x.drawImage(S.logo,0,0);x.globalCompositeOperation='source-in';x.fillStyle=color;x.fillRect(0,0,c.width,c.height);
+S._lbCache={color,src:S.logo,cv:c};return c;}
+function drawMarked(ctx,W,H,img,customPos,px){
+px=px||1;
+ctx.clearRect(0,0,W,H);ctx.drawImage(img,0,0,W,H);
+if(!S.logo)return null;
+const m=S.margin/100*Math.min(W,H);
+const base=S.sizeBase==='min'?Math.min(W,H):S.sizeBase==='max'?Math.max(W,H):S.sizeBase==='h'?H:W;
+const lw0=base*S.size/100, lh0=lw0*(S.logoH/S.logoW);
+const drawOne=(cx,cy,lw,lh,op,filt)=>{
+ctx.save();ctx.globalAlpha=op/100;ctx.translate(cx,cy);ctx.rotate(S.rot*Math.PI/180);
+ctx.filter=filt;
+if(S.lborder){const t=Math.max(1,S.lbw/100*lh),sil=logoSil(S.lbcolor);
+for(let a=0;a<8;a++){const an=a/8*Math.PI*2;ctx.drawImage(sil,-lw/2+Math.cos(an)*t,-lh/2+Math.sin(an)*t,lw,lh);}}
+ctx.drawImage(S.logo,-lw/2,-lh/2,lw,lh);
+ctx.filter='none';
+ctx.restore();};
+if(S.tile&&S.logo){ // tile: bỏ smart + text (fix sample sai tọa độ, text lặp rác)
+const gap=S.tileGap/10,stepX=lw0*gap,stepY=lh0*gap;
+ctx.save();ctx.translate(W/2,H/2);ctx.rotate(-Math.PI/8);ctx.translate(-W,-H);
+for(let y=0;y<H*2.4;y+=stepY)for(let x=0;x<W*2.4;x+=stepX)drawOne(x,y,lw0,lh0,Math.min(S.op,35),'none');
+ctx.restore();return null;}
+let lw=lw0,lh=lh0,cx,cy;
+if(customPos){cx=customPos.x*W;cy=customPos.y*H;}
+else{const b=logoXY(W,H,lw,lh,S.pos,m);cx=b.x+lw/2;cy=b.y+lh/2;}
+let filt='none';
+if(S.smart&&S.logo)filt=lumAt(ctx,(cx-lw/2)*px,(cy-lh/2)*px,lw*px,lh*px)<128?'brightness(0) invert(1)':'brightness(0)';
+drawOne(cx,cy,lw,lh,S.op,filt);
+return{cx,cy,lw,lh};}
+// ---- render: tách editor / grid (fix lag khi kéo + slider) ----
+const ed=$('editor');let drag=false,geom=null;
+function oriOf(im){return im.img.naturalHeight>im.img.naturalWidth?'p':'l';}
+function curCustom(i){return effCustom(S.imgs[i]);}
+function effCustom(im){return oriOf(im)==='p'?S.customP:S.customL;}
+function renderEditor(){
+if(!S.imgs.length){$('edName').textContent='chưa có ảnh';ed.width=640;ed.height=360;
+const c=ed.getContext('2d');c.fillStyle='#000';c.fillRect(0,0,640,360);c.fillStyle='#9aa3b5';c.font='16px Inter,Arial';c.textAlign='center';c.fillText('Thả ảnh vào khung trên để bắt đầu',320,180);geom=null;refreshLock();return;}
+S.sel=Math.min(S.sel,S.imgs.length-1);
+const cur=S.imgs[S.sel];const ori=oriOf(cur)==='p'?'DỌC':'NGANG';
+$('edName').textContent=`[${S.sel+1}/${S.imgs.length}] ${cur.name} • ẢNH ${ori} • ${cur.img.naturalWidth}×${cur.img.naturalHeight}`;
+const dispW=Math.min(900,cur.img.naturalWidth),sc=dispW/cur.img.naturalWidth;
+ed.width=dispW;ed.height=Math.round(cur.img.naturalHeight*sc);
+const ctx=ed.getContext('2d');ctx.save();ctx.scale(sc,sc);
+geom=drawMarked(ctx,cur.img.naturalWidth,cur.img.naturalHeight,cur.img,effCustom(cur),sc);ctx.restore();
+paintRanges();steps();refreshLock();}
+function renderGrid(){
+$('count').textContent=S.imgs.length;
+const nP=S.imgs.filter(im=>oriOf(im)==='p').length;
+document.querySelectorAll('.chips button').forEach(b=>{const f=b.dataset.f;
+b.classList.toggle('on',S.filter===f);
+b.textContent=(f==='all'?'Tất cả':f==='p'?'Ảnh dọc':'Ảnh ngang')+` (${f==='all'?S.imgs.length:f==='p'?nP:S.imgs.length-nP})`;});
+const g=$('grid');g.innerHTML='';
+if(!S.imgs.length){g.innerHTML='<div class="empty">🖼️<br>Chưa có ảnh nào.<br>Bấm <b>＋ Thêm ảnh</b> hoặc kéo-thả file vào khung trên.</div>';return;}
+let shown=0;
+S.imgs.forEach((im,i)=>{
+if(S.filter!=='all'&&oriOf(im)!==S.filter)return;shown++;
+const d=document.createElement('div');d.className='thumb'+(i===S.sel?' sel':'');d.title='Bấm để chọn sửa';
+const c=document.createElement('canvas');const tw=300,sc2=tw/im.img.naturalWidth;c.width=tw;c.height=Math.max(1,Math.round(im.img.naturalHeight*sc2));
+const x=c.getContext('2d');x.save();x.scale(sc2,sc2);drawMarked(x,im.img.naturalWidth,im.img.naturalHeight,im.img,curCustom(i),sc2);x.restore();
+const idx=document.createElement('span');idx.className='idx';idx.textContent=String(i+1).padStart(2,'0');
+const mt=document.createElement('div');mt.className='meta';mt.title=im.name;const s1=document.createElement('span');s1.textContent=im.name;const s2=document.createElement('span');s2.textContent=(im.file.size/1024).toFixed(0)+'KB';mt.append(s1,s2);
+const del=document.createElement('button');del.className='x';del.textContent='✕';del.title='Xóa ảnh này';del.onclick=e=>{e.stopPropagation();delImg(i);};
+d.onclick=()=>{S.sel=i;renderEditor();renderGrid();};
+d.append(c,idx,mt,del);g.appendChild(d);});
+if(!shown)g.innerHTML='<div class="empty">Không có ảnh nào trong nhóm này.<br>Bấm <b>Tất cả</b> để xem hết.</div>';}
+function renderAll(){$('count').textContent=S.imgs.length;renderEditor();renderGrid();steps();}
+// ---- kéo logo (fix hitbox + chỉ vẽ lại editor khi rê) ----
+function evtPos(e){const r=ed.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*ed.width,y:(e.clientY-r.top)/r.height*ed.height};}
+ed.addEventListener('pointerdown',e=>{if(!geom||!S.imgs.length||!S.logo)return;
+const p=evtPos(e);const sc=ed.width/S.imgs[S.sel].img.naturalWidth;
+const cx=geom.cx*sc,cy=geom.cy*sc;
+if(Math.abs(p.x-cx)<geom.lw*sc/2+14&&Math.abs(p.y-cy)<geom.lh*sc/2+14){drag=true;try{ed.setPointerCapture(e.pointerId);}catch(_){}}});
+ed.addEventListener('pointermove',e=>{if(!drag)return;const p=evtPos(e);
+const cx0=Math.min(.98,Math.max(.02,p.x/ed.width)),cy0=Math.min(.98,Math.max(.02,p.y/ed.height));
+if(oriOf(S.imgs[S.sel])==='p')S.customP={x:cx0,y:cy0};else S.customL={x:cx0,y:cy0};
+renderEditor();});
+const endDrag=()=>{if(!drag)return;drag=false;renderGrid();};
+ed.addEventListener('pointerup',endDrag);ed.addEventListener('pointercancel',endDrag);
+// giữ để xem ảnh gốc
+const cmp=$('cmpBtn');let cmpOn=false;
+cmp.addEventListener('pointerdown',e=>{e.preventDefault();if(!S.imgs.length)return;cmpOn=true;
+const cur=S.imgs[S.sel],ctx=ed.getContext('2d');
+ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,ed.width,ed.height);
+ctx.drawImage(cur.img,0,0,ed.width,ed.height);ctx.restore();});
+['pointerup','pointerleave','pointercancel'].forEach(ev=>cmp.addEventListener(ev,()=>{if(!cmpOn)return;cmpOn=false;renderEditor();}));
+// ---- tách nền logo → PNG trong suốt ----
+$('pickBg').onclick=()=>{if(!S.logo)return setStatus('⚠ Thêm logo vào ô trên trước đã.');
+S.pickLogo=!S.pickLogo;logoBox.classList.toggle('pick',S.pickLogo);
+$('pickBg').textContent=S.pickLogo?'🟢 Bấm vào vùng nền trong ô logo (bấm lại để tắt)':'🎯 Tách nền logo';};
+$('logoBg').onclick=e=>{e.stopPropagation();logoBox.classList.toggle('light');};
+$('cutTol').oninput=e=>{S.cutTol=+e.target.value;$('vCut').textContent=S.cutTol+'%';paintRanges();if(S.logoKey)applyCutLogo();};
+$('cutUndo').onclick=()=>{if(!S.logoOrig)return setStatus('⚠ Logo chưa tách nền.');
+S.logo=S.logoOrig;S.logoW=S.logo.naturalWidth;S.logoH=S.logo.naturalHeight;
+S.logoOrig=null;S.logoKey=null;$('cutSw').style.background='';paintLogoPrev();renderEditor();queueGrid();setStatus('↩ Đã hoàn tác tách nền logo.');};
+function pickLogoBg(e){
+const r=$('logoPrev').getBoundingClientRect();
+const nx=(e.clientX-r.left)/r.width*S.logo.naturalWidth|0, ny=(e.clientY-r.top)/r.height*S.logo.naturalHeight|0;
+const src=S.logoOrig||S.logo,c=document.createElement('canvas');c.width=src.naturalWidth;c.height=src.naturalHeight;
+const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0);
+const d=x.getImageData(Math.max(0,Math.min(c.width-1,nx)),Math.max(0,Math.min(c.height-1,ny)),1,1).data;
+S.logoKey={r:d[0],g:d[1],b:d[2]};
+$('cutSw').style.background=`rgb(${d[0]},${d[1]},${d[2]})`;
+applyCutLogo();}
+function applyCutLogo(){
+if(!S.logoKey)return;
+const src=S.logoOrig||S.logo,W=src.naturalWidth,H=src.naturalHeight;
+const c=document.createElement('canvas');c.width=W;c.height=H;
+const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0);
+const dd=x.getImageData(0,0,W,H),px=dd.data,k=S.logoKey,t=S.cutTol/100*441,i0=t*.55;
+for(let i=0;i<px.length;i+=4){const dr=px[i]-k.r,dg=px[i+1]-k.g,db=px[i+2]-k.b;
+const dist=Math.sqrt(dr*dr+dg*dg+db*db);
+let a=255;if(dist<i0)a=0;else if(dist<t)a=Math.round(255*(dist-i0)/(t-i0));
+if(a<px[i+3])px[i+3]=a;}
+x.putImageData(dd,0,0);
+const ni=new Image();ni.onload=()=>{if(!S.logoOrig)S.logoOrig=src;S.logo=ni;S.logoW=W;S.logoH=H;
+$('logoPrev').src=ni.src;paintLogoPrev();renderEditor();queueGrid();
+setStatus('✔ Logo đã trong suốt. Kéo Ngưỡng tách nếu còn lem viền.');};
+ni.src=c.toDataURL('image/png');}
+// ---- export full-res ----
+function renderFull(im){
+const W=im.img.naturalWidth,H=im.img.naturalHeight,c=document.createElement('canvas');c.width=W;c.height=H;
+drawMarked(c.getContext('2d'),W,H,im.img,effCustom(im),1);return c;}
+function outName(im,i){const n=im.name.replace(/\.[^.]+$/,'');const t=($('rename').value||'[Ten_SanPham]_[So_Thu_Tu]').replace('[Ten_SanPham]',n).replace('[So_Thu_Tu]',String(i+1).padStart(2,'0')).replace(/[^\w\-À-ỹ ]/g,'').trim().replace(/\s+/g,'_');const ext=$('fmt').value==='image/png'?'png':$('fmt').value==='image/webp'?'webp':'jpg';return`${t||'anh'}.${ext}`;}
+function setStatus(t){$('status').textContent=t;if(/^[✔⚠↺]/.test(t))toast(t,/^⚠/.test(t));}
+function setBusy(b){S.busy=b;refreshLock();}
+function revoke(u){if(u&&u.indexOf('blob:')===0)try{URL.revokeObjectURL(u)}catch(e){}}
+function saveBlob(b,name){const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);}
+$('dlOne').onclick=()=>{
+if(S.busy)return;
+if(!S.imgs.length)return setStatus('⚠ Chưa có ảnh.');
+if(!S.logo)return setStatus('⚠ Hãy tải logo trước.');
+setBusy(true);const im=S.imgs[S.sel];renderFull(im).toBlob(b=>{setBusy(false);if(!b)return setStatus('⚠ Xuất lỗi, thử định dạng khác.');const n=outName(im,S.sel);saveBlob(b,n);setStatus('✔ Đã tải '+n);},$('fmt').value,$('quality').value/100);};
+$('dlZip').onclick=async()=>{
+if(S.busy)return;
+if(!S.imgs.length)return setStatus('⚠ Chưa có ảnh.');
+if(S.imgs.length>10&&!confirm(`Bạn có ${S.imgs.length} ảnh (Free giới hạn 10/lần demo). Vẫn xuất hết?`))return;
+if(!S.logo)return setStatus('⚠ Hãy tải logo trước.');
+if(typeof JSZip==='undefined'){
+setBusy(true);setStatus('⏳ Không tải được thư viện ZIP (cần mạng lần đầu) — chuyển sang tải lẻ từng ảnh…');
+let okN=0;
+for(let i=0;i<S.imgs.length;i++){const im=S.imgs[i];
+try{const blob=await new Promise(r=>renderFull(im).toBlob(r,$('fmt').value,$('quality').value/100));
+if(blob){saveBlob(blob,outName(im,i));okN++;}}catch(e){}
+setStatus(`⏳ Tải lẻ ${i+1}/${S.imgs.length}…`);await new Promise(r=>setTimeout(r,600));}
+setBusy(false);return setStatus(`✔ Đã tải lẻ ${okN}/${S.imgs.length} ảnh (có mạng sẽ gộp 1 file ZIP).`);}
+setStatus('⏳ Đang render '+S.imgs.length+' ảnh…');setBusy(true);
+const prog=$('zipProg');prog.hidden=false;prog.value=0;
+const zip=new JSZip();let okN=0;
+for(let i=0;i<S.imgs.length;i++){const im=S.imgs[i];
+try{const blob=await new Promise(r=>renderFull(im).toBlob(r,$('fmt').value,$('quality').value/100));
+if(blob){zip.file(outName(im,i),blob);okN++;}}catch(e){}
+prog.value=Math.round((i+1)/S.imgs.length*90);setStatus(`⏳ ${i+1}/${S.imgs.length}…`);}
+if(!okN){setBusy(false);prog.hidden=true;return setStatus('⚠ Xuất lỗi toàn bộ, thử định dạng JPG.');}
+const out=await zip.generateAsync({type:'blob'},m=>{prog.value=90+Math.round((m.percent||0)*0.1);});setBusy(false);prog.hidden=true;saveBlob(out,'pandalee_'+Date.now()+'.zip');setStatus(`✔ Đã tải ZIP ${okN}/${S.imgs.length} ảnh.`);};
+// ---- profiles ----
+function Num(v,d){v=+v;return Number.isFinite(v)?v:d;}
+function logoURL(){try{if(!S.logo)return null;if(S.logoW*S.logoH>640000){toast('⚠ Logo quá to, preset không nhớ logo.',true);return null;}const c=document.createElement('canvas');c.width=S.logoW;c.height=S.logoH;c.getContext('2d').drawImage(S.logo,0,0);return c.toDataURL('image/png');}catch(e){return null;}}
+function getCfg(){return{pos:S.pos,margin:S.margin,size:S.size,rot:S.rot,op:S.op,tile:S.tile,tileGap:S.tileGap,smart:S.smart,lborder:S.lborder,lbcolor:S.lbcolor,lbw:S.lbw,sizeBase:S.sizeBase,customP:S.customP,customL:S.customL,logo:logoURL(),rename:$('rename').value,fmt:$('fmt').value,quality:$('quality').value};}
+function setCfg(c){c=c||{};Object.assign(S,{pos:c.pos||'br',margin:Num(c.margin,4),size:Num(c.size,18),rot:Num(c.rot,0),op:Num(c.op,90),tile:!!c.tile,tileGap:Num(c.tileGap,22),smart:!!c.smart,lborder:!!c.lborder,lbcolor:c.lbcolor||'#ffffff',lbw:Num(c.lbw,4),sizeBase:c.sizeBase||'min',customP:c.customP||null,customL:c.customL||null});if(S.tile)S.smart=false;
+if(c.logo){const im=new Image();im.onload=()=>{revoke(S.logoURL);S.logoURL=null;S.logo=im;S.logoW=im.naturalWidth;S.logoH=im.naturalHeight;S.logoOrig=null;S.logoKey=null;S.pickLogo=false;S._lbCache=null;$('pickBg').textContent='🎯 Tách nền logo';$('cutSw').style.background='';$('logoPrev').src=c.logo;$('logoName').textContent='✔ Logo lấy từ preset';logoBox.classList.remove('pick');logoBox.classList.add('has');paintLogoPrev();renderAll();};im.src=c.logo;}
+$('margin').value=S.margin;$('size').value=S.size;$('rot').value=S.rot;$('op').value=S.op;$('tileGap').value=S.tileGap;$('quality').value=c.quality||92;$('lbw').value=S.lbw;
+$('smart').checked=S.smart;$('tile').checked=S.tile;$('lborder').checked=S.lborder;$('sizeBase').value=S.sizeBase;$('lbcolor').value=S.lbcolor;$('rename').value=c.rename||'[Ten_SanPham]_[So_Thu_Tu]';$('fmt').value=c.fmt||'image/jpeg';
+$('vMargin').textContent=S.margin+'%';$('vSize').textContent=S.size+'%';$('vRot').textContent=S.rot+'°';$('vOp').textContent=S.op+'%';$('vTile').textContent=(S.tileGap/10).toFixed(1)+'×';$('vQ').textContent=$('quality').value+'%';
+[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===S.pos));paintLogoPrev();renderAll();}
+function loadProfiles(){let all;try{all=JSON.parse(localStorage.getItem('logosnap_profiles')||'')}catch(e){all=null;}
+if(!all)all={"Mặc định (Top-Right 80%)":{pos:'tr',margin:4,size:18,rot:0,op:80}};
+const s=$('profile');s.innerHTML='';Object.keys(all).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;s.appendChild(o);});return all;}
+let PROFS=loadProfiles();setCfg(Object.values(PROFS)[0]);
+$('profile').onchange=e=>setCfg(PROFS[e.target.value]);
+$('saveProfile').onclick=()=>{const n=prompt('Tên preset (VD: Logo A + Top-Right 80%):');if(!n)return;PROFS[n]=getCfg();try{localStorage.setItem('logosnap_profiles',JSON.stringify(PROFS));}catch(e){return setStatus('⚠ Bộ nhớ đầy, không lưu được preset.');}PROFS=loadProfiles();$('profile').value=n;setStatus('✔ Đã lưu preset “'+n+'”.');};
+$('delProfile').onclick=()=>{const k=$('profile').value;if(!PROFS[k])return;if(!confirm(`Xóa preset “${k}”?`))return;delete PROFS[k];if(!Object.keys(PROFS).length)PROFS={"Mặc định (Top-Right 80%)":{pos:'tr',margin:4,size:18,rot:0,op:80}};try{localStorage.setItem('logosnap_profiles',JSON.stringify(PROFS));}catch(e){}PROFS=loadProfiles();setCfg(Object.values(PROFS)[0]);setStatus('✔ Đã xóa preset “'+k+'”.');};
+// ---- modal hướng dẫn ----
+const helpModal=$('helpModal');
+$('helpBtn').onclick=()=>helpModal.classList.add('show');
+$('helpClose').onclick=()=>helpModal.classList.remove('show');
+helpModal.addEventListener('click',e=>{if(e.target===helpModal)helpModal.classList.remove('show');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){helpModal.classList.remove('show');return;}if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||S.busy)return;if(!S.imgs.length)return;if(e.key==='ArrowRight'){S.sel=(S.sel+1)%S.imgs.length;renderEditor();renderGrid();}else if(e.key==='ArrowLeft'){S.sel=(S.sel-1+S.imgs.length)%S.imgs.length;renderEditor();renderGrid();}else if(e.key==='Delete'||e.key==='Backspace'){delImg(S.sel);setStatus(`✔ Đã xóa (còn ${S.imgs.length} ảnh).`);}});
+renderAll();
+</script>
+</body>
+</html>
