@@ -132,8 +132,12 @@ small.hint{color:var(--mut);font-size:12px;line-height:1.5}
 .feat-grid b{color:var(--txt)}
 @media(max-width:640px){.feat-grid{grid-template-columns:1fr}}
 .tcolor-row{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;color:#c9cfdb}
+.fbtns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.fbtns button{flex:1 1 30%;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--mut);border-radius:9px;padding:7px 4px;font:inherit;font-size:12px;font-weight:700}
+.fbtns button:hover{color:var(--txt);border-color:var(--line2)}
+.fbtns button.on{background:var(--acc-dim);color:var(--acc2);border-color:var(--acc)}
 @media(max-width:960px){.layout{grid-template-columns:1fr}aside{border-right:0;border-bottom:0;border-top:1px solid var(--line);order:2}main{order:1}#editorWrap{grid-template-columns:1fr}.steps{display:none}main{padding:14px}}
-@media(max-width:480px){.grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}header{padding:10px 12px}main{padding:10px}.drop{padding:22px 14px}}
+@media(max-width:480px){.grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}header{padding:10px 12px}main{padding:10px}.drop{padding:22px 14px}.row>*{min-width:0}.chead{flex-wrap:wrap}.chips{flex-wrap:wrap}.chips button{flex:1 1 100px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bottombar>.btn{flex:1 1 40%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#status{flex:1 1 100%;min-width:0}}
 input:disabled,select:disabled{opacity:.4}
 </style>
 </head>
@@ -186,7 +190,19 @@ input:disabled,select:disabled{opacity:.4}
 <label class="switch"><input type="checkbox" id="tile"> Pattern/Tile: phủ kín lưới chéo</label>
 <label class="lbl">Khoảng Tile <b id="vTile">2.2×</b></label><input type="range" id="tileGap" min="13" max="40" value="22">
 </div>
-<div class="card"><h3>4 • Xuất file</h3>
+<div class="card"><h3>4 • Ảnh: sáng & màu</h3>
+<div class="fbtns"><button data-fp="goc" class="on">Gốc</button><button data-fp="ruc">Rực rỡ</button><button data-fp="am">Trầm ấm</button><button data-fp="mat">Mát mẻ</button><button data-fp="bw">Đen trắng</button><button data-fp="phim">Phim cũ</button></div>
+<label class="lbl">Phơi sáng <b id="vExp">0</b></label><input type="range" id="exp" min="-100" max="100" value="0">
+<label class="lbl">Tương phản <b id="vCon">100%</b></label><input type="range" id="con" min="0" max="200" value="100">
+<label class="lbl">Vùng sáng (nén chói) <b id="vHigh">0%</b></label><input type="range" id="high" min="0" max="100" value="0">
+<label class="lbl">Vùng tối (kéo chi tiết) <b id="vShad">0%</b></label><input type="range" id="shad" min="0" max="100" value="0">
+<label class="lbl">Bão hòa màu <b id="vSat">100%</b></label><input type="range" id="sat" min="0" max="200" value="100">
+<label class="lbl">Nhiệt độ (ấm ↔ lạnh) <b id="vTemp">0</b></label><input type="range" id="temp" min="-100" max="100" value="0">
+<label class="lbl">Chi tiết <b id="vSharp">0%</b></label><input type="range" id="sharp" min="0" max="100" value="0">
+<div class="row" style="margin-top:8px"><button class="btn ghost" id="resetPhoto">↺ Đặt lại màu</button></div>
+<small class="hint">Áp cho tất cả ảnh, ăn theo preset. Cắt/xoay thì làm từng ảnh trong Editor.</small>
+</div>
+<div class="card"><h3>5 • Xuất file</h3>
 <label class="lbl">Nén ảnh (JPG/WebP quality) <b id="vQ">92%</b></label><input type="range" id="quality" min="40" max="100" value="92">
 <small class="hint">Quality chỉ áp dụng cho JPG/WebP (PNG luôn nét nhất).</small>
 <label class="lbl">Đổi tên hàng loạt</label><input type="text" id="rename" value="[Ten_SanPham]_[So_Thu_Tu]">
@@ -204,8 +220,9 @@ input:disabled,select:disabled{opacity:.4}
 </div>
 <div id="editorWrap">
 <div class="card">
-<div class="chead"><h3>Editor — kéo logo trực tiếp</h3><button class="btn ghost" id="cmpBtn" title="Giữ để xem ảnh gốc không logo">👁 Giữ xem gốc</button></div>
+<div class="chead"><h3>Editor — kéo logo trực tiếp</h3><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button class="btn ghost" id="cmpBtn" title="Giữ để xem ảnh gốc thô (chưa chỉnh màu, chưa logo)">👁 Giữ xem gốc</button><button class="btn ghost" id="cropBtn" title="Cắt & xoay từng ảnh">✂ Cắt ảnh</button></div></div>
 <canvas id="editor"></canvas>
+<div id="cropBar" hidden><div class="row" style="margin-top:10px"><select id="cropAspect" title="Tỉ lệ khung cắt"><option value="free">Tự do</option><option value="1:1">1:1</option><option value="4:5">4:5</option><option value="3:4">3:4</option><option value="16:9">16:9</option></select><button class="btn pri" id="cropApply">✔ Cắt</button><button class="btn ghost" id="cropCancel">✕</button></div><div class="row" style="margin-top:8px"><button class="btn" id="cropRot">⟳ Xoay 90°</button><button class="btn" id="cropClear">↺ Bỏ cắt</button></div><label class="lbl">Xoay thẳng chân trời <b id="vStraight">0.0°</b></label><input type="range" id="straight" min="-15" max="15" step="0.1" value="0"><small class="hint">Kéo trên ảnh để chọn khung (lưới 1/3 hỗ trợ căn). Mỗi ảnh nhớ khung + góc xoay riêng.</small></div>
 <div class="edfoot"><small class="hint" id="edName">chưa có ảnh</small></div>
 </div>
 <div class="card"><div class="chead"><h3>Xem trước (<span id="count">0</span> ảnh)</h3><button class="btn ghost" id="addGrid">＋ Thêm</button></div><div class="chips"><button data-f="all" class="on">Tất cả</button><button data-f="p">Dọc</button><button data-f="l">Ngang</button></div><div class="grid" id="grid"></div></div>
@@ -238,15 +255,17 @@ input:disabled,select:disabled{opacity:.4}
 <div><b>◈ AI đổi màu</b><br>Tự đổi logo Trắng ↔ Đen theo độ sáng nền ảnh.</div>
 <div><b>◈ Pattern/Tile</b><br>Phủ kín logo mờ dạng lưới chéo chống copy.</div>
 <div><b>◈ Preset</b><br>Lưu cấu hình + logo → lần sau chọn preset, thả ảnh là xong.</div>
-<div><b>◈ 👁 Giữ xem gốc</b><br>Giữ nút để so ảnh trước/sau khi đóng dấu.</div>
+<div><b>◈ 👁 Giữ xem gốc</b><br>Giữ nút để so ảnh gốc thô với ảnh đã chỉnh màu + đóng dấu.</div>
+<div><b>◈ ✂ Cắt & xoay</b><br>Bấm ✂ trên Editor, kéo khung (lưới 1/3), chọn tỉ lệ, ✔ Cắt. ⟳ Xoay 90° + slider xoay thẳng chân trời (góc hở tự lấp nền mờ).</div>
+<div><b>◈ Sáng/Màu/Nét</b><br>Card 4: phơi sáng, tương phản, vùng sáng/tối, bão hòa, nhiệt độ, chi tiết + 6 lọc màu 1 chạm.</div>
 </div>
 <h3>Mẹo</h3>
-<small class="hint">• Logo đã tách nền + xuất PNG mới giữ được nền trong suốt (JPG thành nền đen).<br>• Không thấy tính năng mới? Nhấn <b>Ctrl+F5</b> để tải lại trang.<br>• Mọi xử lý chạy trên máy bạn — ảnh không upload đi đâu.<br>• Preset nhớ cả logo (nhỏ gọn) + vị trí dọc/ngang — mở lên là dùng ngay.<br>• Chỉnh loạn? Bấm <b>↺ Về cấu hình mặc định</b> (cuối card 4, giữ nguyên logo + ảnh).<br>• <b>Xóa ảnh này</b> chỉ xóa ảnh đang chọn; <b>Xóa hết</b> có hỏi lại trước khi xóa.<br>• PandaLee © 2026 — phát triển bởi <b>PandaLee</b>.</small>
+<small class="hint">• Logo đã tách nền + xuất PNG mới giữ được nền trong suốt (JPG thành nền đen).<br>• Không thấy tính năng mới? Nhấn <b>Ctrl+F5</b> để tải lại trang.<br>• Mọi xử lý chạy trên máy bạn — ảnh không upload đi đâu.<br>• Preset nhớ cả logo (nhỏ gọn) + vị trí dọc/ngang — mở lên là dùng ngay.<br>• Chỉnh loạn? Bấm <b>↺ Về cấu hình mặc định</b> (cuối card 5, giữ nguyên logo + ảnh + khung cắt).<br>• <b>Xóa ảnh này</b> chỉ xóa ảnh đang chọn; <b>Xóa hết</b> có hỏi lại trước khi xóa.<br>• PandaLee © 2026 — phát triển bởi <b>PandaLee</b>.</small>
 </div>
 </div>
 <script>
 const $=id=>document.getElementById(id);
-const S={imgs:[],sel:0,logo:null,logoW:0,logoH:0,logoOrig:null,logoKey:null,pickLogo:false,cutTol:30,lborder:false,lbcolor:'#ffffff',lbw:4,_lbCache:null,busy:false,sizeBase:'min',pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,customP:null,customL:null,filter:'all'};
+const S={imgs:[],sel:0,logo:null,logoW:0,logoH:0,logoOrig:null,logoKey:null,pickLogo:false,cutTol:30,lborder:false,lbcolor:'#ffffff',lbw:4,_lbCache:null,busy:false,sizeBase:'min',pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,customP:null,customL:null,filter:'all',exp:0,con:100,high:0,shad:0,sat:100,temp:0,sharp:0,cropMode:false,cropRect:null,cropStart:null,cropAspect:'free'};
 const POS={tl:[0,0],tc:[.5,0],tr:[1,0],ml:[0,.5],mc:[.5,.5],mr:[1,.5],bl:[0,1],bc:[.5,1],br:[1,1]};
 const ICONS={tl:'↖',tc:'↑',tr:'↗',ml:'←',mc:'•',mr:'→',bl:'↙',bc:'↓',br:'↘'};
 const p9=$('pos9');Object.keys(POS).forEach(k=>{const b=document.createElement('button');b.textContent=ICONS[k];b.dataset.k=k;if(k==='br')b.classList.add('on');b.onclick=()=>{S.pos=k;S.customP=S.customL=null;[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===k));renderAll();};p9.appendChild(b);});
@@ -257,17 +276,28 @@ function steps(){const hasL=!!S.logo,hasI=S.imgs.length>0;const st=$('st1');if(!
 const map=[['st1',hasL],['st2',hasI],['st3',hasL&&hasI],['st4',hasL&&hasI]];
 let actSet=false;map.forEach(([id,done])=>{const el=$(id);el.classList.toggle('done',done);
 el.classList.toggle('active',!done&&!actSet);if(!done)actSet=true;});}
-const LOGO_CTL=['margin','size','rot','op','tileGap','lbw','cutTol','sizeBase','smart','tile','lborder','lbcolor','pickBg','cutUndo','resetPos','cmpBtn'];
+const LOGO_CTL=['margin','size','rot','op','tileGap','lbw','cutTol','sizeBase','smart','tile','lborder','lbcolor','pickBg','cutUndo','resetPos'];
 function refreshLock(){
 const hasL=!!S.logo,hasI=S.imgs.length>0;
 LOGO_CTL.forEach(id=>{const el=$(id);if(el)el.disabled=!hasL;});
 [...p9.children].forEach(b=>b.disabled=!hasL);
 document.querySelectorAll('[data-apply]').forEach(b=>b.disabled=!hasL||!hasI);
 $('dlZip').disabled=$('dlOne').disabled=S.busy||!hasI||!hasL;
-$('delOne').disabled=$('clear').disabled=S.busy||!hasI;if(S.tile&&hasL){$('smart').disabled=true;}}
+$('delOne').disabled=$('clear').disabled=S.busy||!hasI;if(S.tile&&hasL){$('smart').disabled=true;}
+$('cropBtn').disabled=!hasI||S.busy;
+$('cmpBtn').disabled=!hasI||S.busy;}
 function bind(id,key,label,fmt){$(id).oninput=e=>{S[key]=+e.target.value;$(label).textContent=fmt(S[key]);renderEditor();queueGrid();};}
 bind('size','size','vSize',v=>v+'%');bind('rot','rot','vRot',v=>v+'°');bind('op','op','vOp',v=>v+'%');
 bind('margin','margin','vMargin',v=>v+'%');bind('tileGap','tileGap','vTile',v=>(v/10).toFixed(1)+'×');bind('quality','quality','vQ',v=>v+'%');
+bind('con','con','vCon',v=>v+'%');bind('sat','sat','vSat',v=>v+'%');bind('sharp','sharp','vSharp',v=>v+'%');
+$('exp').oninput=e=>{S.exp=+e.target.value;$('vExp').textContent=(S.exp>0?'+':'')+S.exp;renderEditor();queueGrid();};
+$('high').oninput=e=>{S.high=+e.target.value;$('vHigh').textContent=S.high+'%';renderEditor();queueGrid();};
+$('shad').oninput=e=>{S.shad=+e.target.value;$('vShad').textContent=S.shad+'%';renderEditor();queueGrid();};
+$('temp').oninput=e=>{S.temp=+e.target.value;$('vTemp').textContent=(S.temp>0?'+':'')+S.temp;renderEditor();queueGrid();};
+function syncPhotoUI(){$('exp').value=S.exp;$('con').value=S.con;$('high').value=S.high;$('shad').value=S.shad;$('sat').value=S.sat;$('temp').value=S.temp;$('sharp').value=S.sharp;$('vExp').textContent=(S.exp>0?'+':'')+S.exp;$('vCon').textContent=S.con+'%';$('vHigh').textContent=S.high+'%';$('vShad').textContent=S.shad+'%';$('vSat').textContent=S.sat+'%';$('vTemp').textContent=(S.temp>0?'+':'')+S.temp;$('vSharp').textContent=S.sharp+'%';}
+const FILT={goc:{},ruc:{sat:135,con:112,sharp:25},am:{temp:45,sat:110,high:20,con:105},mat:{temp:-45,sat:112},bw:{sat:0,con:118,shad:15},phim:{temp:30,sat:75,con:88,shad:25}};
+document.querySelectorAll('.fbtns button').forEach(b=>b.onclick=()=>{Object.assign(S,{exp:0,con:100,high:0,shad:0,sat:100,temp:0,sharp:0},FILT[b.dataset.fp]||{});syncPhotoUI();document.querySelectorAll('.fbtns button').forEach(x=>x.classList.toggle('on',x===b));renderEditor();queueGrid();});
+$('resetPhoto').onclick=()=>{Object.assign(S,{exp:0,con:100,high:0,shad:0,sat:100,temp:0,sharp:0});syncPhotoUI();document.querySelectorAll('.fbtns button').forEach(x=>x.classList.toggle('on',x.dataset.fp==='goc'));renderEditor();queueGrid();};
 $('lbw').oninput=e=>{S.lbw=+e.target.value;$('vLbw').textContent=S.lbw+'%';if(!S.lborder){S.lborder=true;$('lborder').checked=true;}paintLogoPrev();renderEditor();queueGrid();};
 $('lborder').onchange=e=>{S.lborder=e.target.checked;paintLogoPrev();renderEditor();queueGrid();};
 $('lbcolor').oninput=e=>{S.lbcolor=e.target.value;S._lbCache=null;if(!S.lborder){S.lborder=true;$('lborder').checked=true;}paintLogoPrev();renderEditor();queueGrid();};
@@ -275,8 +305,8 @@ $('smart').onchange=e=>{S.smart=e.target.checked;renderEditor();queueGrid();};
 $('tile').onchange=e=>{S.tile=e.target.checked;if(S.tile){S.smart=false;$('smart').checked=false;}refreshLock();renderEditor();queueGrid();};
 $('sizeBase').onchange=e=>{S.sizeBase=e.target.value;renderEditor();queueGrid();};
 $('resetPos').onclick=()=>{S.customP=S.customL=null;renderAll();setStatus('↺ Đã về vị trí preset.');};
-const DEFAULTS={pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,lborder:false,lbcolor:'#ffffff',lbw:4,sizeBase:'min',customP:null,customL:null};
-$('resetCfg').onclick=()=>{setCfg({...DEFAULTS});setStatus('↺ Đã về cấu hình mặc định (giữ nguyên logo + ảnh).');};
+const DEFAULTS={pos:'br',margin:4,size:18,rot:0,op:90,tile:false,tileGap:22,smart:false,lborder:false,lbcolor:'#ffffff',lbw:4,sizeBase:'min',customP:null,customL:null,exp:0,con:100,high:0,shad:0,sat:100,temp:0,sharp:0};
+$('resetCfg').onclick=()=>{setCfg({...DEFAULTS});setStatus('↺ Đã về cấu hình mặc định (giữ nguyên logo + ảnh + khung cắt).');};
 document.querySelectorAll('[data-apply]').forEach(b=>b.onclick=()=>{
 if(!S.imgs.length)return setStatus('⚠ Chưa có ảnh.');
 const scope=b.dataset.apply;
@@ -294,7 +324,7 @@ logoBox.onclick=e=>{if(S.pickLogo&&S.logo){pickLogoBg(e);return;}$('logoInput').
 ['dragover','dragenter'].forEach(ev=>logoBox.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();logoBox.classList.add('over');}));
 ['dragleave','drop'].forEach(ev=>logoBox.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();logoBox.classList.remove('over');}));
 logoBox.addEventListener('drop',e=>loadLogo(e.dataTransfer.files[0]));
-$('logoDel').onclick=e=>{e.stopPropagation();revoke(S.logoURL);S.logoURL=null;
+$('logoDel').onclick=e=>{e.stopPropagation();if(S.busy)return;revoke(S.logoURL);S.logoURL=null;
 S.logo=null;S.logoW=S.logoH=0;S.logoOrig=null;S.logoKey=null;S.pickLogo=false;S._lbCache=null;
 logoBox.classList.remove('has','pick');$('logoPrev').removeAttribute('src');
 $('logoName').textContent='Chưa có logo.';$('pickBg').textContent='🎯 Tách nền logo';$('cutSw').style.background='';
@@ -302,7 +332,7 @@ paintLogoPrev();renderEditor();queueGrid();setStatus('🗑 Đã xóa logo — b�
 $('logoInput').onchange=e=>{loadLogo(e.target.files[0]);e.target.value='';};
 function paintLogoPrev(){const p=$('logoPrev');if(!S.logo){p.style.filter='';return;}if(!S.lborder){p.style.filter='drop-shadow(0 1px 5px rgba(0,0,0,.65)) drop-shadow(0 0 1px rgba(255,255,255,.4))';return;}const h=p.clientHeight||120,t=Math.max(1,S.lbw/100*h),d=(t*0.7).toFixed(1)+'px',c=S.lbcolor,tpx=t.toFixed(1)+'px';p.style.filter=`drop-shadow(${tpx} 0 0 ${c}) drop-shadow(-${tpx} 0 0 ${c}) drop-shadow(0 ${tpx} 0 ${c}) drop-shadow(0 -${tpx} 0 ${c}) drop-shadow(${d} ${d} 0 ${c}) drop-shadow(-${d} ${d} 0 ${c}) drop-shadow(${d} -${d} 0 ${c}) drop-shadow(-${d} -${d} 0 ${c})`;}
 async function loadLogo(f){
-if(!f)return;let blob=f;
+if(!f||S.busy)return;let blob=f;
 if(/svg/i.test(f.type)||/\.svg$/i.test(f.name)){
 try{let t=await f.text();if(!/width\s*=/i.test(t))t=t.replace(/<svg([^>]*)>/i,'<svg$1 width="800" height="800">');blob=new Blob([t],{type:'image/svg+xml'});}catch(e){}}
 const url=URL.createObjectURL(blob);revoke(S.logoURL);S.logoURL=url;const im=new Image();
@@ -325,14 +355,14 @@ $('imgs').onchange=e=>{addFiles(e.target.files);e.target.value='';};
 ['dragleave','drop'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.remove('over');}));
 $('drop').addEventListener('drop',e=>addFiles(e.dataTransfer.files));
 function addFiles(fs){
-const list=[...fs].filter(f=>f.type.startsWith('image/'));
+if(S.busy)return;const list=[...fs].filter(f=>f.type.startsWith('image/'));
 if(!list.length)return setStatus('⚠ File không phải ảnh.');
 const room=Math.max(0,50-S.imgs.length);
 if(!room)return setStatus('⚠ Tối đa 50 ảnh, hãy xuất bớt rồi thêm tiếp.');
 Promise.all(list.slice(0,room).map(f=>new Promise(res=>{const url=URL.createObjectURL(f);const im=new Image();
 im.onload=()=>res({file:f,name:f.name,img:im,url});im.onerror=()=>{revoke(url);res(null);};im.src=url;})))
 .then(arr=>{const ok=arr.filter(Boolean);S.imgs.push(...ok);S.sel=Math.min(S.sel,Math.max(0,S.imgs.length-1));renderAll();setStatus(`✔ Đã thêm ${ok.length} ảnh (tổng ${S.imgs.length}).`);});}
-function delImg(i){const r=S.imgs[i];if(r)revoke(r.url);S.imgs.splice(i,1);if(i<S.sel)S.sel--;S.sel=Math.max(0,Math.min(S.sel,S.imgs.length-1));renderAll();}
+function delImg(i){if(S.busy)return;const r=S.imgs[i];if(r)revoke(r.url);S.imgs.splice(i,1);if(i<S.sel)S.sel--;S.sel=Math.max(0,Math.min(S.sel,S.imgs.length-1));renderAll();}
 $('delOne').onclick=()=>{if(S.busy)return;const im=S.imgs[S.sel];if(!im)return setStatus('⚠ Chưa có ảnh nào để xóa.');
 const n=im.name;delImg(S.sel);setStatus(`✔ Đã xóa ${n} (còn ${S.imgs.length} ảnh).`);};
 $('clear').onclick=()=>{if(S.busy)return;if(!S.imgs.length)return;if(!confirm(`Xóa hết ${S.imgs.length} ảnh?`))return;
@@ -345,9 +375,27 @@ if(S._lbCache&&S._lbCache.color===color&&S._lbCache.src===S.logo)return S._lbCac
 const c=document.createElement('canvas');c.width=Math.max(1,S.logoW);c.height=Math.max(1,S.logoH);
 const x=c.getContext('2d');x.drawImage(S.logo,0,0);x.globalCompositeOperation='source-in';x.fillStyle=color;x.fillRect(0,0,c.width,c.height);
 S._lbCache={color,src:S.logo,cv:c};return c;}
-function drawMarked(ctx,W,H,img,customPos,px){
-px=px||1;
-ctx.clearRect(0,0,W,H);ctx.drawImage(img,0,0,W,H);
+function photoFilter(){const f=[];if(S.exp)f.push(`brightness(${1+S.exp/100})`);if(S.con!==100)f.push(`contrast(${S.con/100})`);if(S.sat!==100)f.push(`saturate(${S.sat/100})`);return f.length?f.join(' '):'none';}
+function outDims(im){const b=im.crop||{x:0,y:0,w:1,h:1},rot=((im.rot||0)%4+4)%4,st=+im.straight||0;const cw=Math.max(1,Math.round(im.img.naturalWidth*b.w)),ch=Math.max(1,Math.round(im.img.naturalHeight*b.h));let W=rot%2?ch:cw,H=rot%2?cw:ch;if(st){const a=Math.abs(st)*Math.PI/180,c=Math.cos(a),s=Math.sin(a),eW=Math.round(W*c+H*s);H=Math.round(W*s+H*c);W=eW;}return{b,rot,cw,ch,straight:st,W,H};}
+function straightInverse(rx,ry,o){const st=o.straight||0;if(!st)return{x:rx,y:ry};const a=-st*Math.PI/180,dx=rx*o.W-o.W/2,dy=ry*o.H-o.H/2,cx=dx*Math.cos(a)-dy*Math.sin(a),cy=dx*Math.sin(a)+dy*Math.cos(a);const kw=o.rot%2?o.ch:o.cw,kh=o.rot%2?o.cw:o.ch;return{x:(cx+kw/2)/kw,y:(cy+kh/2)/kh};}
+function out2crop(rx,ry,rot){rot=((rot%4)+4)%4;if(rot===1)return{x:ry,y:1-rx};if(rot===2)return{x:1-rx,y:1-ry};if(rot===3)return{x:1-ry,y:rx};return{x:rx,y:ry};}
+function drawMarked(ctx,W,H,img,customPos,px,crop,rot,straight){
+px=px||1;crop=crop||{x:0,y:0,w:1,h:1};rot=((rot||0)%4+4)%4;straight=+straight||0;
+const sx=crop.x*img.naturalWidth,sy=crop.y*img.naturalHeight,sw=Math.max(1,crop.w*img.naturalWidth),sh=Math.max(1,crop.h*img.naturalHeight);
+const cw=Math.max(1,Math.round(sw)),ch=Math.max(1,Math.round(sh));
+const coreW=rot%2?ch:cw,coreH=rot%2?cw:ch;
+const photo=document.createElement('canvas');photo.width=coreW;photo.height=coreH;const bc=photo.getContext('2d');
+bc.save();bc.translate(coreW/2,coreH/2);bc.rotate(rot*Math.PI/2);
+const pf=photoFilter();if(pf!=='none')bc.filter=pf;
+bc.drawImage(img,sx,sy,sw,sh,-cw/2,-ch/2,cw,ch);
+if(S.sharp>0){bc.save();bc.globalAlpha=Math.min(.55,S.sharp/100*.55);bc.filter=(pf!=='none'?pf+' ':'')+`blur(${Math.max(.8,px)}px)`;bc.globalCompositeOperation='overlay';bc.drawImage(img,sx,sy,sw,sh,-cw/2,-ch/2,cw,ch);bc.restore();}
+bc.restore();
+if(S.shad>0){bc.save();bc.globalAlpha=S.shad/100*.45;bc.globalCompositeOperation='soft-light';bc.fillStyle='#fff';bc.fillRect(0,0,coreW,coreH);bc.restore();}
+if(S.high>0){bc.save();bc.globalAlpha=S.high/100*.45;bc.globalCompositeOperation='soft-light';bc.fillStyle='#3c3c3c';bc.fillRect(0,0,coreW,coreH);bc.restore();}
+if(S.temp){bc.save();bc.globalAlpha=Math.abs(S.temp)/100*.5;bc.globalCompositeOperation='soft-light';bc.fillStyle=S.temp>0?'#ff8c28':'#3c78ff';bc.fillRect(0,0,coreW,coreH);bc.restore();}
+let B=photo;
+if(straight){B=document.createElement('canvas');B.width=W;B.height=H;const q=B.getContext('2d');const s=Math.max(W/coreW,H/coreH),dw=coreW*s,dh=coreH*s;q.filter='blur(24px)';q.drawImage(photo,(W-dw)/2,(H-dh)/2,dw,dh);q.filter='none';q.save();q.translate(W/2,H/2);q.rotate(straight*Math.PI/180);q.drawImage(photo,-coreW/2,-coreH/2);q.restore();}
+ctx.clearRect(0,0,W,H);ctx.drawImage(B,0,0);
 if(!S.logo)return null;
 const m=S.margin/100*Math.min(W,H);
 const base=S.sizeBase==='min'?Math.min(W,H):S.sizeBase==='max'?Math.max(W,H):S.sizeBase==='h'?H:W;
@@ -374,19 +422,24 @@ drawOne(cx,cy,lw,lh,S.op,filt);
 return{cx,cy,lw,lh};}
 // ---- render: tách editor / grid (fix lag khi kéo + slider) ----
 const ed=$('editor');let drag=false,geom=null;
-function oriOf(im){return im.img.naturalHeight>im.img.naturalWidth?'p':'l';}
+function oriOf(im){const r=((im.rot||0)%4+4)%4,w=im.img.naturalWidth,h=im.img.naturalHeight,ew=r%2?h:w,eh=r%2?w:h;return eh>ew?'p':'l';}
 function curCustom(i){return effCustom(S.imgs[i]);}
 function effCustom(im){return oriOf(im)==='p'?S.customP:S.customL;}
 function renderEditor(){
 if(!S.imgs.length){$('edName').textContent='chưa có ảnh';ed.width=640;ed.height=360;
-const c=ed.getContext('2d');c.fillStyle='#000';c.fillRect(0,0,640,360);c.fillStyle='#9aa3b5';c.font='16px Inter,Arial';c.textAlign='center';c.fillText('Thả ảnh vào khung trên để bắt đầu',320,180);geom=null;refreshLock();return;}
+const c=ed.getContext('2d');c.fillStyle='#000';c.fillRect(0,0,640,360);c.fillStyle='#9aa3b5';c.font='16px Inter,Arial';c.textAlign='center';c.fillText('Thả ảnh vào khung trên để bắt đầu',320,180);geom=null;
+if(S.cropMode){S.cropMode=false;$('cropBar').hidden=true;$('cropBtn').textContent='✂ Cắt ảnh';}
+refreshLock();return;}
 S.sel=Math.min(S.sel,S.imgs.length-1);
-const cur=S.imgs[S.sel];const ori=oriOf(cur)==='p'?'DỌC':'NGANG';
-$('edName').textContent=`[${S.sel+1}/${S.imgs.length}] ${cur.name} • ẢNH ${ori} • ${cur.img.naturalWidth}×${cur.img.naturalHeight}`;
-const dispW=Math.min(900,cur.img.naturalWidth),sc=dispW/cur.img.naturalWidth;
-ed.width=dispW;ed.height=Math.round(cur.img.naturalHeight*sc);
+const cur=S.imgs[S.sel];const ori=oriOf(cur)==='p'?'DỌC':'NGANG';const o=outDims(cur);
+let nm=`[${S.sel+1}/${S.imgs.length}] ${cur.name} • ẢNH ${ori} • ${o.W}×${o.H}`;if(cur.crop)nm+=' • cắt';if(cur.rot)nm+=' • xoay'+(cur.rot*90)+'°';
+$('edName').textContent=nm;
+if($('straight')){const st=cur.straight||0;$('straight').value=st;$('vStraight').textContent=(+st).toFixed(1)+'°';}
+const dispW=Math.min(900,o.W),sc=dispW/o.W;
+ed.width=dispW;ed.height=Math.round(o.H*sc);
 const ctx=ed.getContext('2d');ctx.save();ctx.scale(sc,sc);
-geom=drawMarked(ctx,cur.img.naturalWidth,cur.img.naturalHeight,cur.img,effCustom(cur),sc);ctx.restore();
+geom=drawMarked(ctx,o.W,o.H,cur.img,effCustom(cur),sc,o.b,o.rot,o.straight);ctx.restore();
+drawCropOverlay();
 paintRanges();steps();refreshLock();}
 function renderGrid(){
 $('count').textContent=S.imgs.length;
@@ -400,8 +453,8 @@ let shown=0;
 S.imgs.forEach((im,i)=>{
 if(S.filter!=='all'&&oriOf(im)!==S.filter)return;shown++;
 const d=document.createElement('div');d.className='thumb'+(i===S.sel?' sel':'');d.title='Bấm để chọn sửa';
-const c=document.createElement('canvas');const tw=300,sc2=tw/im.img.naturalWidth;c.width=tw;c.height=Math.max(1,Math.round(im.img.naturalHeight*sc2));
-const x=c.getContext('2d');x.save();x.scale(sc2,sc2);drawMarked(x,im.img.naturalWidth,im.img.naturalHeight,im.img,curCustom(i),sc2);x.restore();
+const c=document.createElement('canvas');const o=outDims(im);const tw=300,sc2=tw/o.W;c.width=tw;c.height=Math.max(1,Math.round(o.H*sc2));
+const x=c.getContext('2d');x.save();x.scale(sc2,sc2);drawMarked(x,o.W,o.H,im.img,curCustom(i),sc2,o.b,o.rot,o.straight);x.restore();
 const idx=document.createElement('span');idx.className='idx';idx.textContent=String(i+1).padStart(2,'0');
 const mt=document.createElement('div');mt.className='meta';mt.title=im.name;const s1=document.createElement('span');s1.textContent=im.name;const s2=document.createElement('span');s2.textContent=(im.file.size/1024).toFixed(0)+'KB';mt.append(s1,s2);
 const del=document.createElement('button');del.className='x';del.textContent='✕';del.title='Xóa ảnh này';del.onclick=e=>{e.stopPropagation();delImg(i);};
@@ -411,22 +464,35 @@ if(!shown)g.innerHTML='<div class="empty">Không có ảnh nào trong nhóm này
 function renderAll(){$('count').textContent=S.imgs.length;renderEditor();renderGrid();steps();}
 // ---- kéo logo (fix hitbox + chỉ vẽ lại editor khi rê) ----
 function evtPos(e){const r=ed.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*ed.width,y:(e.clientY-r.top)/r.height*ed.height};}
-ed.addEventListener('pointerdown',e=>{if(!geom||!S.imgs.length||!S.logo)return;
-const p=evtPos(e);const sc=ed.width/S.imgs[S.sel].img.naturalWidth;
+ed.addEventListener('pointerdown',e=>{if(S.cropMode){if(!S.imgs.length||S.busy)return;startCrop(e);try{ed.setPointerCapture(e.pointerId);}catch(_){}return;}if(!geom||!S.imgs.length||!S.logo)return;
+const p=evtPos(e);const o=outDims(S.imgs[S.sel]);const sc=ed.width/o.W;
 const cx=geom.cx*sc,cy=geom.cy*sc;
 if(Math.abs(p.x-cx)<geom.lw*sc/2+14&&Math.abs(p.y-cy)<geom.lh*sc/2+14){drag=true;try{ed.setPointerCapture(e.pointerId);}catch(_){}}});
-ed.addEventListener('pointermove',e=>{if(!drag)return;const p=evtPos(e);
+ed.addEventListener('pointermove',e=>{if(S.cropMode){if(S.cropStart)updateCrop(e);return;}if(!drag)return;const p=evtPos(e);
 const cx0=Math.min(.98,Math.max(.02,p.x/ed.width)),cy0=Math.min(.98,Math.max(.02,p.y/ed.height));
 if(oriOf(S.imgs[S.sel])==='p')S.customP={x:cx0,y:cy0};else S.customL={x:cx0,y:cy0};
 renderEditor();});
-const endDrag=()=>{if(!drag)return;drag=false;renderGrid();};
+const endDrag=()=>{if(S.cropMode){S.cropStart=null;return;}if(!drag)return;drag=false;renderGrid();};
 ed.addEventListener('pointerup',endDrag);ed.addEventListener('pointercancel',endDrag);
+function toggleCrop(on){S.cropMode=on;S.cropRect=null;S.cropStart=null;$('cropBar').hidden=!on;$('cropBtn').textContent=on?'✂ Đang cắt…':'✂ Cắt ảnh';renderEditor();}
+$('cropBtn').onclick=()=>toggleCrop(!S.cropMode);
+$('cropAspect').onchange=e=>{S.cropAspect=e.target.value;};
+$('cropCancel').onclick=()=>toggleCrop(false);
+$('cropClear').onclick=()=>{if(S.busy)return;const cur=S.imgs[S.sel];if(cur)cur.crop=null;S.cropRect=null;toggleCrop(false);renderAll();setStatus('↺ Đã bỏ cắt ảnh này.');};
+$('cropRot').onclick=()=>{if(S.busy)return;const cur=S.imgs[S.sel];if(!cur)return;cur.rot=((cur.rot||0)+1)%4;S.cropRect=null;renderAll();};
+$('straight').oninput=e=>{if(S.busy)return;const cur=S.imgs[S.sel];if(!cur)return;cur.straight=+e.target.value;$('vStraight').textContent=(+e.target.value).toFixed(1)+'°';renderEditor();queueGrid();};
+function startCrop(e){const r=ed.getBoundingClientRect();const x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),y=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height));S.cropStart={x,y};S.cropRect={x0:x,y0:y,x1:x,y1:y};renderEditor();}
+function updateCrop(e){const r=ed.getBoundingClientRect();let bx=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),by=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height));const ax=S.cropStart.x,ay=S.cropStart.y;if(S.cropAspect!=='free'){const ab=S.cropAspect.split(':'),t=(+ab[0])/(+ab[1]),vw=ed.width,vh=ed.height;let nw=bx-ax,nh=by-ay;const sx=nw<0?-1:1,sy=nh<0?-1:1;nw=Math.abs(nw);nh=Math.abs(nh);if(nw*vw/(Math.max(nh,1e-4)*vh)>t)nw=t*nh*vh/vw;else nh=nw*vw/(t*vh);bx=Math.min(1,Math.max(0,ax+sx*nw));by=Math.min(1,Math.max(0,ay+sy*nh));}S.cropRect={x0:ax,y0:ay,x1:bx,y1:by};renderEditor();}
+function drawCropOverlay(){if(!S.cropMode||!S.cropRect)return;const r=S.cropRect,x0=Math.min(r.x0,r.x1)*ed.width,x1=Math.max(r.x0,r.x1)*ed.width,y0=Math.min(r.y0,r.y1)*ed.height,y1=Math.max(r.y0,r.y1)*ed.height;const c=ed.getContext('2d');c.save();c.fillStyle='rgba(0,0,0,.55)';c.fillRect(0,0,ed.width,y0);c.fillRect(0,y1,ed.width,ed.height-y1);c.fillRect(0,y0,x0,y1-y0);c.fillRect(x1,y0,ed.width-x1,y1-y0);c.strokeStyle='#22c55e';c.lineWidth=2;c.strokeRect(x0,y0,x1-x0,y1-y0);c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=1;c.setLineDash([5,4]);for(let i=1;i<3;i++){c.beginPath();c.moveTo(x0+(x1-x0)*i/3,y0);c.lineTo(x0+(x1-x0)*i/3,y1);c.stroke();c.beginPath();c.moveTo(x0,y0+(y1-y0)*i/3);c.lineTo(x1,y0+(y1-y0)*i/3);c.stroke();}c.restore();}
+$('cropApply').onclick=()=>{if(S.busy)return;const cur=S.imgs[S.sel];if(!cur)return;if(!S.cropRect)return setStatus('⚠ Kéo một khung trên ảnh trước.');const r=S.cropRect,rx0=Math.min(r.x0,r.x1),ry0=Math.min(r.y0,r.y1),rw=Math.abs(r.x1-r.x0),rh=Math.abs(r.y1-r.y0);if(rw<.02||rh<.02)return toast('⚠ Khung cắt quá nhỏ, kéo rộng ra.',true);const b=cur.crop||{x:0,y:0,w:1,h:1},o=outDims(cur),cl=v=>Math.min(1,Math.max(0,v));const q0=straightInverse(rx0,ry0,o),q1=straightInverse(rx0+rw,ry0+rh,o),p0=out2crop(cl(q0.x),cl(q0.y),o.rot),p1=out2crop(cl(q1.x),cl(q1.y),o.rot);const qx=Math.min(p0.x,p1.x),qy=Math.min(p0.y,p1.y),qw=Math.abs(p1.x-p0.x),qh=Math.abs(p1.y-p0.y);const nx=Math.min(1,Math.max(0,b.x+qx*b.w)),ny=Math.min(1,Math.max(0,b.y+qy*b.h));cur.crop={x:nx,y:ny,w:Math.max(.02,Math.min(1-nx,qw*b.w)),h:Math.max(.02,Math.min(1-ny,qh*b.h))};toggleCrop(false);renderAll();const d=outDims(cur);setStatus(`✔ Đã cắt ảnh ${S.sel+1} (${d.W}×${d.H}).`);};
 // giữ để xem ảnh gốc
 const cmp=$('cmpBtn');let cmpOn=false;
-cmp.addEventListener('pointerdown',e=>{e.preventDefault();if(!S.imgs.length)return;cmpOn=true;
-const cur=S.imgs[S.sel],ctx=ed.getContext('2d');
+cmp.addEventListener('pointerdown',e=>{e.preventDefault();if(!S.imgs.length||S.busy)return;cmpOn=true;
+const cur=S.imgs[S.sel],ctx=ed.getContext('2d'),nw=cur.img.naturalWidth,nh=cur.img.naturalHeight;
 ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,ed.width,ed.height);
-ctx.drawImage(cur.img,0,0,ed.width,ed.height);ctx.restore();});
+ctx.fillStyle='#000';ctx.fillRect(0,0,ed.width,ed.height);
+const s=Math.min(ed.width/nw,ed.height/nh),dw=nw*s,dh=nh*s;
+ctx.drawImage(cur.img,(ed.width-dw)/2,(ed.height-dh)/2,dw,dh);ctx.restore();});
 ['pointerup','pointerleave','pointercancel'].forEach(ev=>cmp.addEventListener(ev,()=>{if(!cmpOn)return;cmpOn=false;renderEditor();}));
 // ---- tách nền logo → PNG trong suốt ----
 $('pickBg').onclick=()=>{if(!S.logo)return setStatus('⚠ Thêm logo vào ô trên trước đã.');
@@ -434,7 +500,7 @@ S.pickLogo=!S.pickLogo;logoBox.classList.toggle('pick',S.pickLogo);
 $('pickBg').textContent=S.pickLogo?'🟢 Bấm vào vùng nền trong ô logo (bấm lại để tắt)':'🎯 Tách nền logo';};
 $('logoBg').onclick=e=>{e.stopPropagation();logoBox.classList.toggle('light');};
 $('cutTol').oninput=e=>{S.cutTol=+e.target.value;$('vCut').textContent=S.cutTol+'%';paintRanges();if(S.logoKey)applyCutLogo();};
-$('cutUndo').onclick=()=>{if(!S.logoOrig)return setStatus('⚠ Logo chưa tách nền.');
+$('cutUndo').onclick=()=>{if(S.busy)return;if(!S.logoOrig)return setStatus('⚠ Logo chưa tách nền.');
 S.logo=S.logoOrig;S.logoW=S.logo.naturalWidth;S.logoH=S.logo.naturalHeight;
 S.logoOrig=null;S.logoKey=null;$('cutSw').style.background='';paintLogoPrev();renderEditor();queueGrid();setStatus('↩ Đã hoàn tác tách nền logo.');};
 function pickLogoBg(e){
@@ -447,7 +513,7 @@ S.logoKey={r:d[0],g:d[1],b:d[2]};
 $('cutSw').style.background=`rgb(${d[0]},${d[1]},${d[2]})`;
 applyCutLogo();}
 function applyCutLogo(){
-if(!S.logoKey)return;
+if(!S.logoKey||S.busy)return;
 const src=S.logoOrig||S.logo,W=src.naturalWidth,H=src.naturalHeight;
 const c=document.createElement('canvas');c.width=W;c.height=H;
 const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0);
@@ -463,8 +529,8 @@ setStatus('✔ Logo đã trong suốt. Kéo Ngưỡng tách nếu còn lem viề
 ni.src=c.toDataURL('image/png');}
 // ---- export full-res ----
 function renderFull(im){
-const W=im.img.naturalWidth,H=im.img.naturalHeight,c=document.createElement('canvas');c.width=W;c.height=H;
-drawMarked(c.getContext('2d'),W,H,im.img,effCustom(im),1);return c;}
+const o=outDims(im),c=document.createElement('canvas');c.width=o.W;c.height=o.H;
+drawMarked(c.getContext('2d'),o.W,o.H,im.img,effCustom(im),1,o.b,o.rot,o.straight);return c;}
 function outName(im,i){const n=im.name.replace(/\.[^.]+$/,'');const t=($('rename').value||'[Ten_SanPham]_[So_Thu_Tu]').replace('[Ten_SanPham]',n).replace('[So_Thu_Tu]',String(i+1).padStart(2,'0')).replace(/[^\w\-À-ỹ ]/g,'').trim().replace(/\s+/g,'_');const ext=$('fmt').value==='image/png'?'png':$('fmt').value==='image/webp'?'webp':'jpg';return`${t||'anh'}.${ext}`;}
 function setStatus(t){$('status').textContent=t;if(/^[✔⚠↺]/.test(t))toast(t,/^⚠/.test(t));}
 function setBusy(b){S.busy=b;refreshLock();}
@@ -490,23 +556,23 @@ setStatus(`⏳ Tải lẻ ${i+1}/${S.imgs.length}…`);await new Promise(r=>setT
 setBusy(false);return setStatus(`✔ Đã tải lẻ ${okN}/${S.imgs.length} ảnh (có mạng sẽ gộp 1 file ZIP).`);}
 setStatus('⏳ Đang render '+S.imgs.length+' ảnh…');setBusy(true);
 const prog=$('zipProg');prog.hidden=false;prog.value=0;
-const zip=new JSZip();let okN=0;
+const zip=new JSZip();let okN=0;const used=new Set();
 for(let i=0;i<S.imgs.length;i++){const im=S.imgs[i];
 try{const blob=await new Promise(r=>renderFull(im).toBlob(r,$('fmt').value,$('quality').value/100));
-if(blob){zip.file(outName(im,i),blob);okN++;}}catch(e){}
+if(blob){let nm=outName(im,i);if(used.has(nm)){const d=nm.lastIndexOf('.');nm=nm.slice(0,d)+'_'+(i+1)+nm.slice(d);}used.add(nm);zip.file(nm,blob);okN++;}}catch(e){}
 prog.value=Math.round((i+1)/S.imgs.length*90);setStatus(`⏳ ${i+1}/${S.imgs.length}…`);}
 if(!okN){setBusy(false);prog.hidden=true;return setStatus('⚠ Xuất lỗi toàn bộ, thử định dạng JPG.');}
 const out=await zip.generateAsync({type:'blob'},m=>{prog.value=90+Math.round((m.percent||0)*0.1);});setBusy(false);prog.hidden=true;saveBlob(out,'pandalee_'+Date.now()+'.zip');setStatus(`✔ Đã tải ZIP ${okN}/${S.imgs.length} ảnh.`);};
 // ---- profiles ----
 function Num(v,d){v=+v;return Number.isFinite(v)?v:d;}
 function logoURL(){try{if(!S.logo)return null;if(S.logoW*S.logoH>640000){toast('⚠ Logo quá to, preset không nhớ logo.',true);return null;}const c=document.createElement('canvas');c.width=S.logoW;c.height=S.logoH;c.getContext('2d').drawImage(S.logo,0,0);return c.toDataURL('image/png');}catch(e){return null;}}
-function getCfg(){return{pos:S.pos,margin:S.margin,size:S.size,rot:S.rot,op:S.op,tile:S.tile,tileGap:S.tileGap,smart:S.smart,lborder:S.lborder,lbcolor:S.lbcolor,lbw:S.lbw,sizeBase:S.sizeBase,customP:S.customP,customL:S.customL,logo:logoURL(),rename:$('rename').value,fmt:$('fmt').value,quality:$('quality').value};}
-function setCfg(c){c=c||{};Object.assign(S,{pos:c.pos||'br',margin:Num(c.margin,4),size:Num(c.size,18),rot:Num(c.rot,0),op:Num(c.op,90),tile:!!c.tile,tileGap:Num(c.tileGap,22),smart:!!c.smart,lborder:!!c.lborder,lbcolor:c.lbcolor||'#ffffff',lbw:Num(c.lbw,4),sizeBase:c.sizeBase||'min',customP:c.customP||null,customL:c.customL||null});if(S.tile)S.smart=false;
+function getCfg(){return{pos:S.pos,margin:S.margin,size:S.size,rot:S.rot,op:S.op,tile:S.tile,tileGap:S.tileGap,smart:S.smart,lborder:S.lborder,lbcolor:S.lbcolor,lbw:S.lbw,sizeBase:S.sizeBase,customP:S.customP,customL:S.customL,exp:S.exp,con:S.con,high:S.high,shad:S.shad,sat:S.sat,temp:S.temp,sharp:S.sharp,logo:logoURL(),rename:$('rename').value,fmt:$('fmt').value,quality:$('quality').value};}
+function setCfg(c){c=c||{};Object.assign(S,{pos:c.pos||'br',margin:Num(c.margin,4),size:Num(c.size,18),rot:Num(c.rot,0),op:Num(c.op,90),tile:!!c.tile,tileGap:Num(c.tileGap,22),smart:!!c.smart,lborder:!!c.lborder,lbcolor:c.lbcolor||'#ffffff',lbw:Num(c.lbw,4),sizeBase:c.sizeBase||'min',customP:c.customP||null,customL:c.customL||null,exp:Num(c.exp,0),con:Num(c.con,100),high:Num(c.high,0),shad:Num(c.shad,0),sat:Num(c.sat,100),temp:Num(c.temp,0),sharp:Num(c.sharp,0)});if(S.tile)S.smart=false;
 if(c.logo){const im=new Image();im.onload=()=>{revoke(S.logoURL);S.logoURL=null;S.logo=im;S.logoW=im.naturalWidth;S.logoH=im.naturalHeight;S.logoOrig=null;S.logoKey=null;S.pickLogo=false;S._lbCache=null;$('pickBg').textContent='🎯 Tách nền logo';$('cutSw').style.background='';$('logoPrev').src=c.logo;$('logoName').textContent='✔ Logo lấy từ preset';logoBox.classList.remove('pick');logoBox.classList.add('has');paintLogoPrev();renderAll();};im.src=c.logo;}
 $('margin').value=S.margin;$('size').value=S.size;$('rot').value=S.rot;$('op').value=S.op;$('tileGap').value=S.tileGap;$('quality').value=c.quality||92;$('lbw').value=S.lbw;
 $('smart').checked=S.smart;$('tile').checked=S.tile;$('lborder').checked=S.lborder;$('sizeBase').value=S.sizeBase;$('lbcolor').value=S.lbcolor;$('rename').value=c.rename||'[Ten_SanPham]_[So_Thu_Tu]';$('fmt').value=c.fmt||'image/jpeg';
 $('vMargin').textContent=S.margin+'%';$('vSize').textContent=S.size+'%';$('vRot').textContent=S.rot+'°';$('vOp').textContent=S.op+'%';$('vTile').textContent=(S.tileGap/10).toFixed(1)+'×';$('vQ').textContent=$('quality').value+'%';
-[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===S.pos));paintLogoPrev();renderAll();}
+[...p9.children].forEach(x=>x.classList.toggle('on',x.dataset.k===S.pos));syncPhotoUI();const isDef=S.exp===0&&S.con===100&&S.high===0&&S.shad===0&&S.sat===100&&S.temp===0&&S.sharp===0;document.querySelectorAll('.fbtns button').forEach(x=>x.classList.toggle('on',isDef&&x.dataset.fp==='goc'));paintLogoPrev();renderAll();}
 function loadProfiles(){let all;try{all=JSON.parse(localStorage.getItem('logosnap_profiles')||'')}catch(e){all=null;}
 if(!all)all={"Mặc định (Top-Right 80%)":{pos:'tr',margin:4,size:18,rot:0,op:80}};
 const s=$('profile');s.innerHTML='';Object.keys(all).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;s.appendChild(o);});return all;}
